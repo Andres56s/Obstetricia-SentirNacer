@@ -1,0 +1,107 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cee6349df9d1c344bbb5c2eacdf80f9, type: 3}
+  m_Name: LeyIntegral_Quiz
+  m_EditorClassIdentifier: Assembly-CSharp::Obstetricia.Data.QuizData
+  moduleLabel: "M\xD3DULO EDUCATIVO"
+  title: LEY INTEGRAL DE LA MUJER
+  subtitle: Conoce tus derechos. Decidir informada es tu poder.
+  iconId: scale
+  pointsPerCorrect: 100
+  motto: Aprende, decide y protege tus derechos.
+  mottoDetail: "Cada decisi\xF3n te acerca a un parto respetado"
+  environment:
+    clip: {fileID: 0}
+    fileOrUrl: 
+    yawOffset: 0
+  questions:
+  - situation: "Durante tu trabajo de parto te proponen hacerte una episiotom\xEDa
+      sin explicarte por qu\xE9 ni pedirte tu consentimiento."
+    question: "\xBFCu\xE1l es la mejor respuesta seg\xFAn la ley?"
+    options:
+    - title: Puedo decidir sobre mi cuerpo.
+      description: "Tengo derecho a recibir informaci\xF3n clara y a otorgar mi consentimiento
+        para cualquier procedimiento."
+      image: {fileID: 21300000, guid: 255c1a27f65298d4b88359d35accf48a, type: 3}
+    - title: "El personal de salud decide lo que es mejor para m\xED."
+      description: "Debo obedecer las indicaciones aunque no est\xE9 de acuerdo."
+      image: {fileID: 21300000, guid: 2550540daee9008499558da4f0048577, type: 3}
+    correctIndex: 0
+    environment:
+      clip: {fileID: 0}
+      fileOrUrl: 
+      yawOffset: 0
+  - situation: "Al ingresar a preparto te dicen que tu acompa\xF1ante debe esperar
+      afuera \"porque estorba\", sin darte ninguna raz\xF3n cl\xEDnica."
+    question: "\xBFQu\xE9 puedes hacer?"
+    options:
+    - title: "Solicitar estar acompa\xF1ada."
+      description: "Puedo pedir que una persona de mi confianza me acompa\xF1e y
+        que, si no es posible, me expliquen la raz\xF3n cl\xEDnica."
+      image: {fileID: 21300000, guid: 8f9f5847065424943926a7548422a998, type: 3}
+    - title: Aceptar estar sola.
+      description: "El acompa\xF1amiento es un favor del equipo y no puedo pedirlo."
+      image: {fileID: 21300000, guid: 608566308be36024f9945a82f35fa296, type: 3}
+    correctIndex: 0
+    environment:
+      clip: {fileID: 0}
+      fileOrUrl: 
+      yawOffset: 0
+  - situation: 'Mientras expresas dolor, una persona del equipo te dice: "No grites,
+      si cuando lo hiciste no te quejabas".'
+    question: "\xBFC\xF3mo se debe entender esta situaci\xF3n?"
+    options:
+    - title: Es normal en un parto.
+      description: Son comentarios sin importancia; debo aguantar en silencio.
+      image: {fileID: 21300000, guid: 8236956bd31ef8d46a89f9d6e17d830c, type: 3}
+    - title: Es un trato humillante.
+      description: Tengo derecho a un trato digno y respetuoso; puedo reclamar o
+        denunciar esta conducta.
+      image: {fileID: 0}
+    correctIndex: 1
+    environment:
+      clip: {fileID: 0}
+      fileOrUrl: 
+      yawOffset: 0
+  - situation: "Quieres moverte y usar el bal\xF3n kin\xE9sico para aliviar el dolor,
+      pero te ordenan permanecer acostada sin ninguna indicaci\xF3n cl\xEDnica."
+    question: "\xBFCu\xE1l es la mejor respuesta?"
+    options:
+    - title: "Pedir informaci\xF3n y elegir mi posici\xF3n."
+      description: "Si no hay contraindicaci\xF3n, puedo moverme y usar m\xE9todos
+        no farmacol\xF3gicos para el dolor."
+      image: {fileID: 21300000, guid: 4352673c583dd7f48ad1c5e9e927493f, type: 3}
+    - title: Quedarme acostada siempre.
+      description: "La posici\xF3n la decide solo el equipo, aunque no haya raz\xF3n
+        cl\xEDnica."
+      image: {fileID: 21300000, guid: 22aa363ffbfedb44f877f234af67d2cc, type: 3}
+    correctIndex: 0
+    environment:
+      clip: {fileID: 0}
+      fileOrUrl: 
+      yawOffset: 0
+  - situation: "Despu\xE9s del parto quieres reclamar por un trato que consideras
+      violento."
+    question: "\xBFQu\xE9 camino corresponde?"
+    options:
+    - title: Ya no se puede hacer nada.
+      description: "Una vez terminado el parto no existen v\xEDas para reclamar."
+      image: {fileID: 0}
+    - title: Reclamar y denunciar.
+      description: Puedo presentar un reclamo en la OIRS del establecimiento, acudir
+        a la Superintendencia de Salud y denunciar.
+      image: {fileID: 21300000, guid: b8825e2e8d9c46443acb5da1fa4f2dd5, type: 3}
+    correctIndex: 1
+    environment:
+      clip: {fileID: 0}
+      fileOrUrl: 
+      yawOffset: 0

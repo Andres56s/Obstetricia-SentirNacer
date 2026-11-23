@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 955dc4195bbd6e14da5adfa471e55601, type: 3}
+  m_Name: ObstetriciaTheme
+  m_EditorClassIdentifier: Assembly-CSharp::Obstetricia.Data.ObstetriciaTheme
+  pedestalBody: {fileID: 2100000, guid: b7973ff5615b6984ea380d9d62081c39, type: 2}
+  pedestalTop: {fileID: 2100000, guid: 897c2bf7f590a434985912262ead1f21, type: 2}
+  glow: {fileID: 2100000, guid: 47335c70cf1b52a4bb014a52c116e780, type: 2}
+  ucnLogo: {fileID: 2800000, guid: 0df0125054778bd4693fc0cf2c5dd949, type: 3}
+  logoCircle: {x: 0.50097656, y: 0.49926758, z: 0.43603516}
+  bone: {fileID: 2100000, guid: 42556444a26756149b79fdcfd29b617d, type: 2}
+  boneDetail: {fileID: 2100000, guid: b0fa6c7dac7b6e442bc652aeff0b3825, type: 2}
+  pelvisModel: {fileID: 4005029837349619447, guid: 43fe4c6ce8312e444ad97fdce9f45d2e, type: 3}
+  boneGhost: {fileID: 2100000, guid: 89339fb00d44b7043b46983095fe0dab, type: 2}
+  fetalHead: {fileID: 2100000, guid: 9c49e03a18b77714ab2ae977a3d9d0ea, type: 2}
+  video360: {fileID: 2100000, guid: 8ba345b8f81275647ad764c51e0eccd6, type: 2}
+  line: {fileID: 2100000, guid: 21c9fb112c19cad4f9673e8501e45d27, type: 2}
+  fisioCard:
+    title: "PROGRAMA FISIO-BAL\xD3N Y M\xC9TODOS NO FARMACOL\xD3GICOS DEL DOLOR"
+    image: {fileID: 21300000, guid: 99ffa6e66418e4548a3e38427d28f009, type: 3}
+    iconId: ball
+  legalCard:
+    title: "PROGRAMA LEGAL: VIOLENCIA OBST\xC9TRICA / LEY INTEGRAL DE LA MUJER"
+    image: {fileID: 21300000, guid: fffe46d8c44618246a3e89e206886939, type: 3}
+    iconId: scale
