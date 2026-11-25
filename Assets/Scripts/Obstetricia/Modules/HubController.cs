@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Obstetricia.Data;
 using Obstetricia.UI;
 using TMPro;
@@ -33,9 +34,19 @@ namespace Obstetricia.Modules
         private MaterialPropertyBlock _rimBlock;
         private Color _rimColor;
         private Coroutine _anim;
+        private LogoAnimado _logo;
+        private bool _logoVisto;
+        private readonly List<(Transform t, Vector3 pos, Quaternion rot)> _flotan = new List<(Transform, Vector3, Quaternion)>();
+        private readonly List<Transform> _anillos = new List<Transform>();
+        private readonly List<SpriteRenderer> _luces = new List<SpriteRenderer>();
+        private readonly List<RectTransform> _fotos = new List<RectTransform>();
+        private RectTransform _destello;
         private bool _hintDismissed;
 
         public event Action FisioSelected;
+
+        /// <summary>Se invoca al elegir la sala virtual de obstetricia.</summary>
+        public event Action SalaSelected;
 
         /// <summary>Se invoca al pulsar el botón de ajustes de la mesa.</summary>
         public event Action SettingsRequested;
@@ -71,10 +82,32 @@ namespace Obstetricia.Modules
             _anim = StartCoroutine(HideRoutine(done));
         }
 
+        /// <summary>Oculta todo al instante (con la vista ya cubierta por la transición).</summary>
+        public void HideNow()
+        {
+            _hintDismissed = true;
+            if (_anim != null) StopCoroutine(_anim);
+            _anim = null;
+            _cards.SetActive(false);
+            _pedestal.SetActive(false);
+            if (_logo != null) _logo.Ocultar();
+            if (_hint != null) _hint.SetActive(false);
+        }
+
         private IEnumerator ShowRoutine()
         {
             HoloFeedback.Play(HoloFeedback.Sound.Open, 0.7f);
+            if (_logo != null) _logo.Ocultar();
+            if (_hint != null) _hint.SetActive(false);
             yield return ScalePedestal(0f, 1f, 0.45f, true);
+            if (_logo != null)
+            {
+                // La primera vez la entrada es completa; al volver a la mesa es más rápida.
+                bool listo = false;
+                _logo.Reproducir(_logoVisto ? 1.7f : 1f, () => listo = true);
+                _logoVisto = true;
+                while (!listo) yield return null;
+            }
             _cards.SetActive(true);
             if (_hint != null) _hint.SetActive(!_hintDismissed);
             _anim = null;
@@ -83,6 +116,7 @@ namespace Obstetricia.Modules
         private IEnumerator HideRoutine(Action done)
         {
             HoloFeedback.Play(HoloFeedback.Sound.Close, 0.6f);
+            if (_logo != null) _logo.Despedir();
             foreach (Transform child in _cards.transform) HoloAppear.HideObject(child.gameObject);
             yield return new WaitForSecondsRealtime(0.15f);
             yield return ScalePedestal(1f, 0f, 0.3f, false);
@@ -116,13 +150,71 @@ namespace Obstetricia.Modules
             if (_rim != null)
             {
                 // El borde "respira" suavemente.
-                float pulse = 0.75f + 0.25f * Mathf.Sin(time * 2.2f);
+                float pulse = 0.75f + 0.25f * Mathf.Sin(time * 2.2f) + (_logo != null ? _logo.Golpe * 0.9f : 0f);
                 _rim.GetPropertyBlock(_rimBlock);
                 _rimBlock.SetColor("_BaseColor", _rimColor * pulse);
                 _rim.SetPropertyBlock(_rimBlock);
             }
+            if (_pedestal.activeSelf) AnimarMesa(time);
             if (_cards != null && _cards.activeSelf)
+            {
                 _cards.transform.localPosition = new Vector3(0f, Mathf.Sin(time * 1.1f) * 0.006f, 0f);
+                AnimarTarjetas(time);
+            }
+        }
+
+        /// <summary>Anillos de luz que suben por la columna y luces que recorren el borde del disco.</summary>
+        private void AnimarMesa(float time)
+        {
+            for (int i = 0; i < _anillos.Count; i++)
+            {
+                float k = Mathf.Repeat(time * 0.22f + i / (float)_anillos.Count, 1f);
+                float w = pedestalRadius * 1.15f * 1.012f, edge = Mathf.Sin(k * Mathf.PI);
+                _anillos[i].localPosition = new Vector3(0f, Mathf.Lerp(0.04f, pedestalHeight - 0.05f, k), 0f);
+                _anillos[i].localScale = new Vector3(w, 0.0005f + 0.003f * edge, w);
+            }
+            Camera cam = Camera.main;
+            for (int i = 0; i < _luces.Count; i++)
+            {
+                int grupo = i / 6, cola = i % 6;
+                float a = time * 0.9f * (grupo == 0 ? 1f : -0.7f) + grupo * Mathf.PI - cola * 0.07f * (grupo == 0 ? 1f : -1f);
+                float y = pedestalHeight + 0.012f + 0.012f * Mathf.Sin(time * 1.7f + grupo);
+                _luces[i].transform.localPosition = new Vector3(Mathf.Cos(a), 0f, Mathf.Sin(a)) * (pedestalRadius * 1.09f) + Vector3.up * y;
+                if (cam != null) _luces[i].transform.rotation = cam.transform.rotation;
+            }
+        }
+
+        /// <summary>Las tarjetas flotan cada una a su ritmo, las fotos se acercan lentamente y un destello recorre el botón de la sala.</summary>
+        private void AnimarTarjetas(float time)
+        {
+            for (int i = 0; i < _flotan.Count; i++)
+            {
+                var (t, pos, rot) = _flotan[i];
+                float f = time * 0.9f + i * 1.9f;
+                t.localPosition = pos + Vector3.up * (Mathf.Sin(f) * 0.004f);
+                t.localRotation = rot * Quaternion.Euler(Mathf.Sin(f * 0.8f) * 0.7f, Mathf.Cos(f * 0.6f) * 0.9f, 0f);
+            }
+            for (int i = 0; i < _fotos.Count; i++)
+                _fotos[i].localScale = Vector3.one * (1.04f + 0.04f * Mathf.Sin(time * 0.35f + i * 2.1f));
+            if (_emblemRing != null) _emblemRing.localScale = Vector3.one * (1f + 0.07f * Mathf.Pow(Mathf.Max(0f, Mathf.Sin(time * 2.2f)), 4f));
+            if (_destello != null) _destello.anchoredPosition = new Vector2(Mathf.Lerp(-420f, 420f, Mathf.Repeat(time, 4.5f) / 1.1f), 0f);
+        }
+
+        private void BuildMesaFx()
+        {
+            Material glow = Mat(theme != null ? theme.glow : null, new Color(0.3f, 0.8f, 1f));
+            for (int i = 0; i < 3; i++) _anillos.Add(Cylinder("Anillo", glow, Vector3.zero, Vector3.one * 0.01f, false).transform);
+            for (int i = 0; i < 12; i++)
+            {
+                var go = new GameObject("Luz");
+                go.transform.SetParent(_pedestal.transform, false);
+                var s = go.AddComponent<SpriteRenderer>();
+                s.sprite = HoloSprites.Circle;
+                float k = 1f - (i % 6) / 6f;
+                s.color = new Color(0.55f, 0.92f, 1f, 0.9f * k * k);
+                go.transform.localScale = Vector3.one * (0.013f * (0.35f + 0.65f * k) / Mathf.Max(0.001f, s.sprite.bounds.size.x));
+                _luces.Add(s);
+            }
         }
 
         private Material Mat(Material m, Color fallback)
@@ -153,11 +245,31 @@ namespace Obstetricia.Modules
             cover.AddComponent<BoxCollider>().size = new Vector3(1f, 2f, 1f);
 
             BuildLogo();
+            BuildMesaFx();
         }
 
         private void BuildLogo()
         {
             float y = pedestalHeight + 0.0195f;
+            if (theme != null && theme.logoLetra != null && theme.logoLetras != null && theme.logoLetras.Length == 4 && theme.logoLetras[0] != null)
+            {
+                // Disco vacío con el azul del logo; las letras llegan animadas.
+                var blank = new GameObject("DiscoLogo");
+                blank.transform.SetParent(_pedestal.transform, false);
+                blank.transform.localPosition = new Vector3(0f, y, 0f);
+                blank.AddComponent<MeshFilter>().sharedMesh = BuildLogoDisc(pedestalRadius, theme.logoCircle);
+                var blue = new Material(theme.pedestalTop != null ? theme.pedestalTop : new Material(Shader.Find("Universal Render Pipeline/Lit"))) { name = "DiscoLogo" };
+                blue.SetTexture("_BaseMap", null);
+                blue.SetColor("_BaseColor", theme.logoAzul);
+                blue.EnableKeyword("_EMISSION");
+                blue.SetColor("_EmissionColor", theme.logoAzul.linear * 0.55f);
+                var br = blank.AddComponent<MeshRenderer>();
+                br.sharedMaterial = blue;
+                br.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                _logo = blank.AddComponent<LogoAnimado>();
+                _logo.Construir(pedestalRadius, theme.logoLetras, theme.logoLetra);
+                return;
+            }
             if (theme != null && theme.ucnLogo != null)
             {
                 // El círculo azul del logo se mapea exacto sobre la cara superior del disco.
@@ -264,6 +376,20 @@ namespace Obstetricia.Modules
             BuildCard(fisio, new Vector3(-dx, cy, dz + cardsDepth), angle, () => FisioSelected?.Invoke());
             BuildCard(legal, new Vector3(dx, cy, dz + cardsDepth), -angle, () => LegalSelected?.Invoke());
 
+            // Acceso a la sala virtual, sobre las dos tarjetas.
+            Canvas sala = HoloUI.CreateCanvas(_cards.transform, "SalaVirtual", new Vector2(560, 92));
+            sala.transform.localPosition = new Vector3(0f, cardsBottom + CardHeight * HoloUI.MillimeterScale + 0.075f, cardsDepth + 0.04f);
+            HoloUI.Button(sala.transform, "EntrarSala", "SALA VIRTUAL DE OBSTETRICIA", Vector2.zero, new Vector2(560, 84), () => SalaSelected?.Invoke(), "home", 23);
+            RectTransform marco = HoloUI.Rect(sala.transform.Find("EntrarSala"), "Marco", Vector2.zero, new Vector2(536, 76));
+            marco.gameObject.AddComponent<RectMask2D>();
+            _destello = HoloUI.Rect(marco, "Destello", new Vector2(-420f, 0f), new Vector2(200, 60));
+            _destello.localRotation = Quaternion.Euler(0f, 0f, 72f);
+            var brillo = _destello.gameObject.AddComponent<Image>();
+            brillo.sprite = HoloSprites.Scan;
+            brillo.color = new Color(0.6f, 0.92f, 1f, 0.35f);
+            brillo.raycastTarget = false;
+            _flotan.Add((sala.transform, sala.transform.localPosition, sala.transform.localRotation));
+
             // Emblema circular en la unión inferior de las tarjetas.
             Canvas emblem = HoloUI.CreateCanvas(_cards.transform, "Emblema", new Vector2(64, 64));
             emblem.transform.localPosition = new Vector3(0f, cardsBottom + 0.01f, cardsDepth - 0.01f);
@@ -308,7 +434,9 @@ namespace Obstetricia.Modules
             header.Background.raycastTarget = false;
             HoloUI.Text(header.transform, "Title", data.title, 19, Vector2.zero, new Vector2(CardWidth - 50, 80), TextAlignmentOptions.Center,
                 HoloColors.Text, FontStyles.Bold);
-            HoloUI.Picture(card.transform, "Foto", data.image, new Vector2(0, -45), new Vector2(CardWidth - 24, 300));
+            Image foto = HoloUI.Picture(card.transform, "Foto", data.image, new Vector2(0, -45), new Vector2(CardWidth - 24, 300));
+            _fotos.Add(foto.rectTransform);
+            _flotan.Add((canvas.transform, canvas.transform.localPosition, canvas.transform.localRotation));
         }
     }
 }

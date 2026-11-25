@@ -97,6 +97,12 @@ namespace Obstetricia.Tools
                                         : (left ? leftDrawAction.action : drawAction.action);
             float value = act != null ? act.ReadValue<float>() : 0f;
             bool pressed = value >= pressThreshold;
+            if (usingHand)
+            {
+                // Con manos: se dibuja solo con las yemas realmente juntas.
+                var lector = Obstetricia.Core.LectorMano.De(left);
+                if (lector != null) pressed = lector.Pellizco;
+            }
             if (pressed && _current == null) BeginStroke(p);
             else if (pressed) Extend(p);
             else if (!pressed && _current != null) EndStroke();

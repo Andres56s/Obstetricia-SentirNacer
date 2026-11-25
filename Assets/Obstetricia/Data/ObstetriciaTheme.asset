@@ -17,6 +17,13 @@ MonoBehaviour:
   glow: {fileID: 2100000, guid: 47335c70cf1b52a4bb014a52c116e780, type: 2}
   ucnLogo: {fileID: 2800000, guid: 0df0125054778bd4693fc0cf2c5dd949, type: 3}
   logoCircle: {x: 0.50097656, y: 0.49926758, z: 0.43603516}
+  logoLetras:
+  - {fileID: -354255066870337907, guid: 919fca2931546154c916783f6cf90980, type: 3}
+  - {fileID: 3748940775453882593, guid: 919fca2931546154c916783f6cf90980, type: 3}
+  - {fileID: 5233438230569354565, guid: 919fca2931546154c916783f6cf90980, type: 3}
+  - {fileID: 4138792263391548788, guid: 919fca2931546154c916783f6cf90980, type: 3}
+  logoLetra: {fileID: 2100000, guid: c08fce5e3791a91418f9923e62bdad33, type: 2}
+  logoAzul: {r: 0, g: 0.14901961, b: 1, a: 1}
   bone: {fileID: 2100000, guid: 42556444a26756149b79fdcfd29b617d, type: 2}
   boneDetail: {fileID: 2100000, guid: b0fa6c7dac7b6e442bc652aeff0b3825, type: 2}
   pelvisModel: {fileID: 4005029837349619447, guid: 43fe4c6ce8312e444ad97fdce9f45d2e, type: 3}

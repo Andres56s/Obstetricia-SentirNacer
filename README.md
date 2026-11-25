@@ -7,6 +7,8 @@ Aplicación de realidad mixta para Meta Quest 3 / 3S para estudiantes de Obstetr
 - **Mesa UCEN** con los dos programas.
 - **Programa Fisio-balón**: anatomía de la pelvis (se activa al detectar el balón kinésico), diámetros pélvicos, mecanismos del parto en 3D, videos 360° y evaluación.
 - **Programa Legal**: violencia obstétrica / Ley Integral de la Mujer (quiz de situaciones).
+- **Sala virtual de obstetricia** al atardecer: cama de parto, monitor fetal simulado, cuna radiante con recién nacido, test de Apgar, dilatación cervical, balón, liana, musicoterapia, guatero y fichas de estudio.
+- Logo UCEN animado y guía rápida con manos 3D.
 - Tutorial inicial, ajustes de comodidad, uso con manos o controles y registro de resultados.
 
 ## Requisitos
@@ -38,7 +40,8 @@ git clone <url-del-repositorio>
 | `Assets/Editor/Obstetricia` | Setup de la escena y contenido inicial |
 | `Assets/Obstetricia/Data` | Contenido editable (quizzes, secciones, tema) |
 | `Assets/Obstetricia/Modelos` | Pelvis 3D y modelo de detección YOLO |
+| `Assets/Obstetricia/Sala` | Modelos, texturas, audio y materiales de la sala virtual |
 | `Assets/Obstetricia/Imagenes` | Logo y fotos de las tarjetas |
-| `Herramientas` | Script para generar un detector especializado del balón |
+| `Herramientas` | Detector especializado del balón y scripts de Blender (equipamiento y letras del logo) |
 
 > El contenido legal y clínico es un borrador que debe validar el equipo docente.

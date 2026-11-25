@@ -18,6 +18,12 @@ namespace Obstetricia.Data
         [Tooltip("Círculo del logo dentro de la imagen, en UV: centro (x, y) y radio (z).")]
         public Vector3 logoCircle = new Vector3(0.501f, 0.499f, 0.436f);
 
+        [Tooltip("Letras 3D del logo en el orden U, C, E, N (para la animación de entrada).")]
+        public Mesh[] logoLetras;
+        public Material logoLetra;
+        [Tooltip("Azul del logo.")]
+        public Color logoAzul = new Color32(0, 38, 255, 255);
+
         [Header("Anatomía")]
         public Material bone;
         public Material boneDetail;

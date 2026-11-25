@@ -21,7 +21,7 @@ namespace Obstetricia
     /// </summary>
     public class ObstetriciaApp : MonoBehaviour
     {
-        public enum Screen { Hub, Fisio, Legal }
+        public enum Screen { Hub, Fisio, Legal, Sala }
 
         [SerializeField] private XROrigin xrOrigin;
         [SerializeField] private ARAnchorManager anchorManager;
@@ -29,6 +29,7 @@ namespace Obstetricia
         [SerializeField] private FisioModuleController fisio;
         [SerializeField] private QuizController legal;
         [SerializeField] private Video360Player video;
+        [SerializeField] private Obstetricia.Sala.SalaVirtual sala;
 
         [Header("Colocación")]
         [SerializeField, Tooltip("Distancia (m) entre el usuario y el centro de la mesa UCN.")]
@@ -83,6 +84,8 @@ namespace Obstetricia
                 StudentRecords.Save("Ley Integral de la Mujer", correct, total, score);
                 ShowHub();
             };
+            if (hub != null) hub.SalaSelected += ShowSala;
+            if (sala != null) sala.SalirPedido += LeaveSala;
             if (hub != null) hub.SettingsRequested += SettingsPanel.Open;
             if (fisio != null) fisio.SettingsRequested += SettingsPanel.Open;
             SettingsPanel.TutorialRequested += StartTutorial;
@@ -109,19 +112,12 @@ namespace Obstetricia
             Recenter();
         }
 
-        /// <summary>Muestra el tutorial (oculta temporalmente el menú principal).</summary>
+        /// <summary>Muestra la guía rápida en su ventana flotante; el menú sigue disponible.</summary>
         public void StartTutorial()
         {
-            if (tutorial == null) return;
-            if (fisio != null) fisio.Close();
-            if (legal != null) legal.Close();
-            if (video != null && video.IsActive) video.Stop();
-            if (hub != null) hub.Hide();
-            tutorial.Run(this, () =>
-            {
-                AppSettings.TutorialDone = true;
-                ShowHub();
-            });
+            if (tutorial == null || Current == Screen.Sala) return;
+            ShowHub();
+            tutorial.Run(this, () => AppSettings.TutorialDone = true);
         }
 
         private void OnEnable()
@@ -274,6 +270,21 @@ namespace Obstetricia
             else Open();
         }
 
+        /// <summary>Entra a la sala virtual con una transición suave (la mesa se oculta con la vista cubierta).</summary>
+        public void ShowSala()
+        {
+            if (_busy || sala == null) return;
+            if (!sala.Entrar(() => { if (hub != null) hub.HideNow(); })) return;
+            Current = Screen.Sala;
+            SettingsPanel.Close();
+            Debug.Log("[Obstetricia] Sala virtual");
+        }
+
+        private void LeaveSala()
+        {
+            if (sala.Salir(ShowHub)) Debug.Log("[Obstetricia] Saliendo de la sala virtual");
+        }
+
         private bool AnchorsReady => anchorManager != null && anchorManager.enabled && anchorManager.subsystem != null
                                      && anchorManager.subsystem.running;
 
@@ -338,6 +349,12 @@ namespace Obstetricia
         {
             try
             {
+                // Dentro de la sala se recentra con un parpadeo: mover el entorno a la vista produciría mareo.
+                if (Current == Screen.Sala)
+                {
+                    sala.Recentrar();
+                    return;
+                }
                 Transform head = Head;
                 if (head == null) return;
                 Vector3 forward = Vector3.ProjectOnPlane(head.forward, Vector3.up).normalized;

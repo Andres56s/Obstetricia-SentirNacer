@@ -28,6 +28,32 @@ namespace Obstetricia.UI
             src.PlayOneShot(Clip(sound), volume * Volume);
         }
 
+        private static readonly AudioClip[] Notes = new AudioClip[5];
+        // Do, mi, sol, do agudo y un "pop" grave
+        private static readonly float[] NoteFreq = { 523.25f, 659.25f, 783.99f, 1046.5f, 330f };
+
+        /// <summary>Nota tipo marimba (0 a 3 suben como acorde; 4 es un golpe grave).</summary>
+        public static void Note(int i, float volume = 0.8f)
+        {
+            if (!Obstetricia.Core.AppSettings.Sounds) return;
+            AudioSource src = Source();
+            if (src == null) return;
+            i = Mathf.Clamp(i, 0, Notes.Length - 1);
+            if (Notes[i] == null)
+            {
+                int n = (int)(Rate * 0.55f);
+                var data = new float[n];
+                for (int k = 0; k < n; k++)
+                {
+                    float t = k / (float)Rate, w = 2f * Mathf.PI * NoteFreq[i] * t;
+                    float body = i == 4 ? Mathf.Sin(w * (1f + 0.5f * Mathf.Exp(-t * 18f))) : Mathf.Sin(w);
+                    data[k] = (body * Mathf.Exp(-t * 9f) + 0.35f * Mathf.Sin(w * 3.93f) * Mathf.Exp(-t * 28f)) * Mathf.Min(1f, t * 400f) * 0.4f;
+                }
+                Notes[i] = Make("nota" + i, data);
+            }
+            src.PlayOneShot(Notes[i], volume * Volume);
+        }
+
         /// <summary>Vibración en el control que originó el evento de UI (rayo o toque).</summary>
         public static void Haptic(BaseEventData eventData, float amplitude, float duration)
         {
@@ -36,6 +62,14 @@ namespace Obstetricia.UI
                 HapticImpulsePlayer player = c.GetComponentInParent<HapticImpulsePlayer>();
                 if (player != null) player.SendHapticImpulse(amplitude, duration);
             }
+        }
+
+        /// <summary>Vibración en el control que sostiene un objeto.</summary>
+        public static void Haptic(UnityEngine.XR.Interaction.Toolkit.Interactables.XRBaseInteractable held, float amplitude, float duration)
+        {
+            if (held == null || held.interactorsSelecting.Count == 0 || !(held.interactorsSelecting[0] is Component c)) return;
+            HapticImpulsePlayer player = c.GetComponentInParent<HapticImpulsePlayer>();
+            if (player != null) player.SendHapticImpulse(amplitude, duration);
         }
 
         /// <summary>Vibración en ambos controles (por ejemplo al recentrar).</summary>

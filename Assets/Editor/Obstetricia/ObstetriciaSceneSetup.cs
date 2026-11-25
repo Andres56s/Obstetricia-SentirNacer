@@ -143,6 +143,8 @@ namespace ObstetriciaSetup
 
             TutorialController tutorial = Child<TutorialController>(root, "Tutorial", Vector3.zero);
             Set(tutorial, "grabMaterial", AssetDatabase.LoadAssetAtPath<Material>("Assets/Materials/MR/GrabCube.mat"));
+            ManosSetup.Tutorial(tutorial);
+            ManosSetup.Aplicar();
 
             ObstetriciaApp app = root.AddComponent<ObstetriciaApp>();
             Set(app, "tutorial", tutorial);
@@ -152,6 +154,7 @@ namespace ObstetriciaSetup
             Set(app, "fisio", fisio);
             Set(app, "legal", legalQuiz);
             Set(app, "video", video);
+            Set(app, "sala", SalaBuilder.Ensure(scene, origin, theme));
         }
 
         // ------------------------------------------------------------------ Escena
@@ -234,8 +237,37 @@ namespace ObstetriciaSetup
             if (theme.boneGhost == null) theme.boneGhost = GhostMaterial("HuesoTranslucido",
                 AssetDatabase.LoadAssetAtPath<Texture2D>(Base + "/Modelos/Pelvis/PelvisFemenina_BaseColor.png"));
             if (theme.ucnLogo == null) theme.ucnLogo = AssetDatabase.LoadAssetAtPath<Texture2D>(Base + "/Imagenes/LogoUCEN.png");
+            LetrasLogo(theme);
             EditorUtility.SetDirty(theme);
             return theme;
+        }
+
+        /// <summary>Asigna las letras 3D del logo (animación de la mesa).</summary>
+        public static void LetrasLogo(ObstetriciaTheme theme)
+        {
+            string path = Base + "/Modelos/LetrasUCEN.fbx";
+            var mi = AssetImporter.GetAtPath(path) as ModelImporter;
+            if (mi == null) return;
+            if (mi.importAnimation || mi.animationType != ModelImporterAnimationType.None)
+            {
+                mi.importAnimation = false;
+                mi.animationType = ModelImporterAnimationType.None;
+                mi.materialImportMode = ModelImporterMaterialImportMode.None;
+                mi.SaveAndReimport();
+            }
+            var letras = new Mesh[4];
+            foreach (UnityEngine.Object o in AssetDatabase.LoadAllAssetsAtPath(path))
+                if (o is Mesh m)
+                    for (int i = 0; i < 4; i++)
+                        if (m.name == "Letra" + "UCEN"[i]) letras[i] = m;
+            theme.logoLetras = letras;
+            if (theme.logoLetra == null)
+            {
+                theme.logoLetra = new Material(Shader.Find("MR/LetraLogo")) { name = "LetraLogo" };
+                AssetDatabase.CreateAsset(theme.logoLetra, MatFolder + "/LetraLogo.mat");
+            }
+            EditorUtility.SetDirty(theme);
+            AssetDatabase.SaveAssets();
         }
 
         private static T LoadOrCreate<T>(string path, Action<T> fill) where T : ScriptableObject

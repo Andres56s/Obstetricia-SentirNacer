@@ -58,6 +58,9 @@ namespace Obstetricia.Modules
         [SerializeField, Tooltip("Grados por segundo con el joystick a fondo.")]
         private float rotateSpeed = 110f;
 
+        [SerializeField, Tooltip("Fondo oscuro del panel (para que se lea sobre muros claros).")]
+        private bool darkGlass;
+
         private const float PanelWidth = 0.78f;
         private const float PanelHeight = 0.5f;
 
@@ -161,6 +164,16 @@ namespace Obstetricia.Modules
                 if (detector.IsBallDetected) Unlock();
             }
             StateChanged?.Invoke();
+        }
+
+        /// <summary>Modelo de la pelvis (espacio del prefab).</summary>
+        public Transform Model => _model;
+
+        /// <summary>Muestra la pelvis sin requerir la pelota (sala virtual).</summary>
+        public void ActivateFree()
+        {
+            Activate();
+            Unlock();
         }
 
         /// <summary>Sale de la sección: oculta el modelo y apaga el detector.</summary>
@@ -351,7 +364,7 @@ namespace Obstetricia.Modules
 
             _canvas = HoloUI.CreateCanvas(_root.transform, "Glass", new Vector2(PanelWidth * 1000f, PanelHeight * 1000f));
             HoloPanel glass = HoloUI.Panel(_canvas.transform, "Background", Vector2.zero, new Vector2(PanelWidth * 1000f, PanelHeight * 1000f),
-                HoloColors.Glass, HoloColors.Border);
+                darkGlass ? new Color(0.05f, 0.12f, 0.24f, 0.9f) : HoloColors.Glass, HoloColors.Border);
             glass.Background.raycastTarget = false;
             _panelTitle = HoloUI.Text(glass.transform, "Title", "PELVIS ÓSEA FEMENINA", 30, new Vector2(-120, 210), new Vector2(500, 40),
                 TextAlignmentOptions.Left, HoloColors.Text, FontStyles.Bold);
