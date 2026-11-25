@@ -1,5 +1,6 @@
 using System;
 using Obstetricia.Core;
+using Obstetricia.Desktop;
 using Obstetricia.UI;
 using TMPro;
 using UnityEngine;
@@ -21,7 +22,7 @@ namespace Obstetricia.Modules
         [SerializeField] private Material handMaterial;
         [SerializeField] private Material glowMaterial;
 
-        private const float Ancho = 480f, Alto = 250f, Distancia = 0.78f, Costado = 35f;
+        private const float Ancho = 480f, Alto = 250f, Distancia = 0.78f, Costado = 35f, CostadoEscritorio = 24f;
 
         private Canvas _canvas;
         private TextMeshProUGUI _title, _body, _state;
@@ -42,29 +43,35 @@ namespace Obstetricia.Modules
 
         private struct Step
         {
-            public string Icon, Title, Hand, Control, Button;
+            public string Icon, Title, DesktopTitle, Hand, Control, Desktop, Button;
         }
 
         private static readonly Step[] Steps =
         {
-            new Step { Icon = "pointer", Title = "Junta los dedos",
+            new Step { Icon = "pointer", Title = "Junta los dedos", DesktopTitle = "Mira y haz clic",
                 Hand = "Une la yema del <b>índice</b> con la del <b>pulgar</b> hasta que se toquen. Luego sepáralas.",
-                Control = "Aprieta y suelta el <b>gatillo</b> del control." },
+                Control = "Aprieta y suelta el <b>gatillo</b> del control.",
+                Desktop = "Mueve el <b>mouse</b> para mirar y haz <b>clic izquierdo</b>. <b>Esc</b> suelta el cursor." },
             new Step { Icon = "pointer", Title = "Apunta y elige",
                 Hand = "Apunta al botón con la mano y <b>junta los dedos</b> para elegirlo.",
-                Control = "Apunta al botón con el control y aprieta el <b>gatillo</b>.", Button = "Elígeme" },
+                Control = "Apunta al botón con el control y aprieta el <b>gatillo</b>.",
+                Desktop = "Pon la <b>mira</b> (el punto blanco) sobre el botón y haz <b>clic izquierdo</b>.", Button = "Elígeme" },
             new Step { Icon = "cube", Title = "Toma y suelta",
                 Hand = "Acerca la mano al <b>cubo</b> y cierra los dedos. Muévelo y <b>abre la mano</b> para soltarlo.",
-                Control = "Acércate al <b>cubo</b>, mantén el <b>gatillo lateral</b>, muévelo y suéltalo." },
-            new Step { Icon = "notes", Title = "Toca de cerca",
+                Control = "Acércate al <b>cubo</b>, mantén el <b>gatillo lateral</b>, muévelo y suéltalo.",
+                Desktop = "<b>Mantén el clic</b> sobre el cubo. <b>Rueda</b>: acercar · <b>Tab</b>+mouse: rotar · <b>H</b>: devolver." },
+            new Step { Icon = "notes", Title = "Toca de cerca", DesktopTitle = "Camina",
                 Hand = "También puedes <b>tocar</b> los botones con la punta del índice.",
-                Control = "También puedes <b>tocar</b> los botones con la punta del control.", Button = "Tócame" },
+                Control = "También puedes <b>tocar</b> los botones con la punta del control.",
+                Desktop = "Camina con <b>W A S D</b> (Shift para correr) y haz clic en este botón.", Button = "Tócame" },
             new Step { Icon = "recenter", Title = "Recentrar la vista",
                 Hand = "Mira tu <b>palma derecha</b>, junta los dedos y mantenlos hasta completar el círculo.",
-                Control = "Mantén el <b>botón Meta</b> (derecho) o el de <b>menú</b> (izquierdo) por un segundo.", Button = "Después" },
+                Control = "Mantén el <b>botón Meta</b> (derecho) o el de <b>menú</b> (izquierdo) por un segundo.",
+                Desktop = "Si la mesa queda lejos o detrás tuyo, <b>mantén la tecla R</b> por un segundo.", Button = "Después" },
             new Step { Icon = "check", Title = "¡Listo!",
                 Hand = "Escribe tu nombre para guardar tus resultados, o empieza cuando quieras.",
-                Control = "Escribe tu nombre para guardar tus resultados, o empieza cuando quieras.", Button = "Empezar" },
+                Control = "Escribe tu nombre para guardar tus resultados, o empieza cuando quieras.",
+                Desktop = "Escribe tu nombre con el teclado o empieza cuando quieras. <b>C</b> muestra los controles.", Button = "Empezar" },
         };
 
         /// <summary>Muestra la guía desde el principio.</summary>
@@ -79,6 +86,7 @@ namespace Obstetricia.Modules
                 _trigger = new InputAction("GatilloTutorial", InputActionType.Button);
                 _trigger.AddBinding("<XRController>{LeftHand}/{TriggerButton}");
                 _trigger.AddBinding("<XRController>{RightHand}/{TriggerButton}");
+                if (PlatformMode.IsDesktop) _trigger.AddBinding("<Mouse>/leftButton");
             }
             _trigger.Enable();
             if (_app != null) _app.Recentered += OnRecentered;
@@ -176,8 +184,8 @@ namespace Obstetricia.Modules
             _waitingRecenter = _index == 4;
             bool last = _index == Steps.Length - 1;
             _usingHands = HandsInUse();
-            _title.text = s.Title;
-            _body.text = _usingHands ? s.Hand : s.Control;
+            _title.text = PlatformMode.IsDesktop && !string.IsNullOrEmpty(s.DesktopTitle) ? s.DesktopTitle : s.Title;
+            _body.text = Texto(s, _usingHands);
             _action.gameObject.SetActive(!string.IsNullOrEmpty(s.Button));
             if (!string.IsNullOrEmpty(s.Button)) _action.SetText(s.Button);
             _second.gameObject.SetActive(last);
@@ -189,7 +197,7 @@ namespace Obstetricia.Modules
             _big.sprite = HoloSprites.Icon(s.Icon);
             _ring.fillAmount = 0f;
             if (!_canvas.gameObject.activeSelf) _canvas.gameObject.SetActive(true);
-            Narrator.Speak(s.Title + ". " + _body.text);
+            Narrator.Speak(_title.text + ". " + _body.text);
             if (_waitingGrab) SpawnCube();
             else DestroyCube();
         }
@@ -200,7 +208,11 @@ namespace Obstetricia.Modules
             _state.gameObject.SetActive(on);
         }
 
-        private static bool HandsInUse() => LectorMano.De(false) != null || LectorMano.De(true) != null || !ControlsTracked();
+        private static string Texto(Step s, bool hands) =>
+            PlatformMode.IsDesktop && !string.IsNullOrEmpty(s.Desktop) ? s.Desktop : hands ? s.Hand : s.Control;
+
+        // En el navegador no hay manos ni controles: se muestran los textos de teclado y mouse, sin la mano 3D.
+        private static bool HandsInUse() => !PlatformMode.IsDesktop && (LectorMano.De(false) != null || LectorMano.De(true) != null || !ControlsTracked());
 
         private static bool ControlsTracked()
         {
@@ -311,7 +323,7 @@ namespace Obstetricia.Modules
             if (hands != _usingHands)
             {
                 _usingHands = hands;
-                _body.text = hands ? Steps[_index].Hand : Steps[_index].Control;
+                _body.text = Texto(Steps[_index], hands);
             }
             LectorMano a = LectorMano.De(false), b = LectorMano.De(true);
             float cierre = Mathf.Max(a != null ? a.Cierre : 0f, b != null ? b.Cierre : 0f);
@@ -356,7 +368,9 @@ namespace Obstetricia.Modules
             Vector3 fwd = Vector3.ProjectOnPlane(cam.transform.forward, Vector3.up).normalized;
             if (fwd.sqrMagnitude < 0.01f) fwd = Vector3.forward;
             // A la izquierda para dejar libre la mano derecha (al revés en modo zurdo).
-            Vector3 dir = Quaternion.Euler(0f, AppSettings.LeftHanded ? Costado : -Costado, 0f) * fwd;
+            // En pantalla el campo de visión es menor que en el visor: la ventana se acerca al centro para que no se corte.
+            float side = PlatformMode.IsDesktop ? CostadoEscritorio : Costado;
+            Vector3 dir = Quaternion.Euler(0f, AppSettings.LeftHanded ? side : -side, 0f) * fwd;
             _pos = cam.transform.position + dir * Distancia + Vector3.down * 0.1f;
             if (!now) return;
             transform.position = _pos;

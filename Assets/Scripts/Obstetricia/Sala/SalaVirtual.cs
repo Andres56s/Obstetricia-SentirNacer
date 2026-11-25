@@ -80,7 +80,9 @@ namespace Obstetricia.Sala
                 if (ambiente != null) ambiente.CapturarReflejos();
                 if (_paneles == null) BuildPanels();
                 AcomodarMenu();
-            }, () => Info("Bienvenida/o a la sala de obstetricia. Apunta a los círculos del piso para moverte y toma objetos con el gatillo lateral o cerrando la mano. Apunta a un equipo para ver para qué se usa.", true));
+                // En escritorio el menú parte plegado: se despliega con la tecla E.
+                if (MenuPlegable) _menu.gameObject.SetActive(false);
+            },() => Info("Bienvenida/o a la sala de obstetricia. Apunta a los círculos del piso para moverte y toma objetos con el gatillo lateral o cerrando la mano. Apunta a un equipo para ver para qué se usa.", true));
         }
 
         /// <summary>Vuelve a la realidad mixta. "muestra" se ejecuta con la vista cubierta.</summary>
@@ -147,12 +149,53 @@ namespace Obstetricia.Sala
             Transform head = Head;
             Vector3 fwd = Vector3.ProjectOnPlane(head.forward, Vector3.up).normalized;
             if (fwd.sqrMagnitude < 0.01f) fwd = Vector3.forward;
-            Vector3 dir = Quaternion.Euler(0f, -48f, 0f) * fwd;
-            Vector3 pos = head.position + dir * 0.85f;
-            pos.y = Mathf.Clamp(head.position.y - 0.18f, 0.85f, 1.5f);
+            // En pantalla el campo de visión es menor que en el visor: el menú se despliega casi al frente.
+            Vector3 dir = Quaternion.Euler(0f, MenuPlegable ? -8f : -48f, 0f) * fwd;
+            Vector3 pos = head.position + dir * (MenuPlegable ? 0.95f : 0.85f);
+            pos.y = Mathf.Clamp(head.position.y - (MenuPlegable ? 0.06f : 0.18f), 0.85f, 1.5f);
             _menu.transform.position = pos;
             HoloUI.FaceTowards(_menu.transform, head.position);
         }
+
+        // ------------------------------------------------------------------ Menú desplegable (modo escritorio)
+
+        /// <summary>Sin visor (teclado y mouse) el menú se pliega: se abre con E y se cierra al elegir una opción.</summary>
+        private static bool MenuPlegable => Obstetricia.Desktop.PlatformMode.IsDesktop;
+
+        public bool MenuVisible => _menu != null && _menu.gameObject.activeSelf;
+
+        /// <summary>Tecla E: despliega el menú (ocultando la pelvis o los mecanismos) o lo vuelve a plegar.</summary>
+        public void AlternarMenu()
+        {
+            if (!Abierta || velo.Busy || _menu == null) return;
+            if (MenuVisible) OcultarMenu();
+            else AbrirMenu();
+        }
+
+        private void AbrirMenu()
+        {
+            if (_modoPelvis != 0)
+            {
+                _modoPelvis = 0;
+                ActivarPelvis();
+            }
+            AcomodarMenu();
+            _menu.gameObject.SetActive(true); // HoloAppear anima la aparición
+            HoloFeedback.Play(HoloFeedback.Sound.Open, 0.4f);
+        }
+
+        private void OcultarMenu()
+        {
+            if (!MenuVisible) return;
+            HoloAppear.HideObject(_menu.gameObject);
+        }
+
+        /// <summary>Ejecuta la opción y, en escritorio, pliega el menú para dejar a la vista lo elegido.</summary>
+        private UnityEngine.Events.UnityAction Opcion(Action accion) => () =>
+        {
+            accion();
+            if (MenuPlegable) OcultarMenu();
+        };
 
         // ------------------------------------------------------------------ Pelvis y calor
 
@@ -291,16 +334,16 @@ namespace Obstetricia.Sala
             _info.fontSizeMax = 16f;
 
             Height(r, "Cama de parto", 74, cama);
-            _btnPelvis = HoloUI.Button(r, "Pelvis", "Pelvis 3D", new Vector2(-102, -24), new Vector2(194, 58), () => MostrarPelvis(1), "cube", 18);
-            _btnMec = HoloUI.Button(r, "Mecanismos", "Mecanismos", new Vector2(102, -24), new Vector2(194, 58), () => MostrarPelvis(2), "target", 18);
-            HoloUI.Button(r, "Calentar", "Calentar guatero", new Vector2(-102, -94), new Vector2(194, 56), () => guatero.Calentar(1f), "pulse", 16);
-            HoloUI.Button(r, "Cortina", "Cortina", new Vector2(102, -94), new Vector2(194, 56), () => cortina.Alternar(), "labels", 17);
-            HoloUI.Button(r, "Devolver", "Devolver guatero", new Vector2(-102, -160), new Vector2(194, 56), () => guatero.Restablecer(false), "undo", 16);
-            HoloUI.Button(r, "Ordenar", "Ordenar sala", new Vector2(102, -160), new Vector2(194, 56), () =>
+            _btnPelvis = HoloUI.Button(r, "Pelvis", "Pelvis 3D", new Vector2(-102, -24), new Vector2(194, 58), Opcion(() => MostrarPelvis(1)), "cube", 18);
+            _btnMec = HoloUI.Button(r, "Mecanismos", "Mecanismos", new Vector2(102, -24), new Vector2(194, 58), Opcion(() => MostrarPelvis(2)), "target", 18);
+            HoloUI.Button(r, "Calentar", "Calentar guatero", new Vector2(-102, -94), new Vector2(194, 56), Opcion(() => guatero.Calentar(1f)), "pulse", 16);
+            HoloUI.Button(r, "Cortina", "Cortina", new Vector2(102, -94), new Vector2(194, 56), Opcion(() => cortina.Alternar()), "labels", 17);
+            HoloUI.Button(r, "Devolver", "Devolver guatero", new Vector2(-102, -160), new Vector2(194, 56), Opcion(() => guatero.Restablecer(false)), "undo", 16);
+            HoloUI.Button(r, "Ordenar", "Ordenar sala", new Vector2(102, -160), new Vector2(194, 56), Opcion(() =>
             {
                 cama.Restablecer();
                 ObjetoSala.RestablecerTodos();
-            }, "restart", 16);
+            }), "restart", 16);
             HoloUI.Button(r, "Salir", "Salir de la sala", new Vector2(0, -254), new Vector2(398, 68), () => SalirPedido?.Invoke(), "home", 21, HoloColors.Gold);
         }
 

@@ -21,6 +21,8 @@ namespace Obstetricia.Core
         /// <summary>Guarda un resultado. Devuelve false si no se pudo escribir.</summary>
         public static bool Save(string module, int correct, int total, int score)
         {
+            // Dentro de la página web, el resultado también se envía para guardarlo en Firestore.
+            Desktop.WebBridge.SendResult(module, correct, total, score);
             try
             {
                 bool exists = File.Exists(FilePath);

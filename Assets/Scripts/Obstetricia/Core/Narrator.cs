@@ -66,6 +66,8 @@ namespace Obstetricia.Core
                 SpeakNow(text);
             }
             catch (Exception ex) { Debug.LogWarning("[Obstetricia] Texto a voz: " + ex.Message); }
+#elif UNITY_WEBGL && !UNITY_EDITOR
+            Desktop.WebBridge.Speak(StripTags(text));
 #else
             Debug.Log("[Obstetricia] (Narración) " + text);
 #endif
@@ -76,6 +78,8 @@ namespace Obstetricia.Core
         {
 #if UNITY_ANDROID && !UNITY_EDITOR
             try { if (_ready) _tts.Call<int>("stop"); } catch { }
+#elif UNITY_WEBGL && !UNITY_EDITOR
+            Desktop.WebBridge.StopSpeaking();
 #endif
         }
 

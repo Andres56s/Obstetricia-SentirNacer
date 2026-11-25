@@ -42,3 +42,6 @@ Thumbs.db
 /Herramientas/*.pt
 /Assets/_Recovery/
 /Assets/_Recovery.meta
+
+# Solución generada por el IDE (formato nuevo)
+*.slnx

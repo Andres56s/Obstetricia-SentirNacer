@@ -3,6 +3,7 @@ using Obstetricia.Media;
 using Obstetricia.Modules;
 using System.Collections.Generic;
 using Obstetricia.Core;
+using Obstetricia.Desktop;
 using Obstetricia.UI;
 using TMPro;
 using Unity.XR.CoreUtils;
@@ -43,6 +44,9 @@ namespace Obstetricia
             new InputAction("Recentrar", InputActionType.Button, "<XRController>{LeftHand}/menuButton"));
         [SerializeField] private float recenterHoldSeconds = 1f;
 
+        /// <summary>Metros extra de distancia a la mesa en modo escritorio.</summary>
+        private const float DesktopExtraDistance = 0.45f;
+
         private ARAnchor _anchor;
         private bool _busy;
         private bool _moving;
@@ -69,6 +73,22 @@ namespace Obstetricia
 
         private void Awake()
         {
+            if (PlatformMode.IsDesktop)
+            {
+                // Modo escritorio: mantener R recentra la mesa (igual que el botón de menú del control).
+                InputAction recenter = recenterAction.action;
+                if (recenter != null)
+                {
+                    bool wasEnabled = recenter.enabled;
+                    if (wasEnabled) recenter.Disable();
+                    recenter.AddBinding("<Keyboard>/r");
+                    if (wasEnabled) recenter.Enable();
+                }
+                // Dentro de la página web, el nombre del alumno llega en la URL.
+                string webName = WebBridge.StudentName;
+                if (!string.IsNullOrWhiteSpace(webName)) AppSettings.StudentName = webName.Trim();
+            }
+
             if (hub != null)
             {
                 hub.FisioSelected += ShowFisio;
@@ -170,7 +190,7 @@ namespace Obstetricia
         /// <summary>Mantener el botón de menú del control izquierdo muestra un anillo de progreso y recentra al completarse.</summary>
         private void HandleRecenterHold()
         {
-            bool pressed = recenterAction.action != null && recenterAction.action.IsPressed();
+            bool pressed = recenterAction.action != null && recenterAction.action.IsPressed() && !HoloKeyboard.IsOpen;
             if (pressed && _holdTime >= 0f)
             {
                 _holdTime += Time.unscaledDeltaTime;
@@ -221,8 +241,11 @@ namespace Obstetricia
                 await Awaitable.WaitForSecondsAsync(placementDelay);
                 bool restored = await TryRestoreSavedAnchor();
                 if (!restored) Recenter();
-                if (!AppSettings.TutorialDone && tutorial != null) StartTutorial();
-                else ShowHub();
+                WebBridge.SendReady();
+                // Abre lo que pidió la web (o la mesa); la guía rápida flota aparte y solo se ve sobre la mesa.
+                ShowStart();
+                if (!AppSettings.TutorialDone && tutorial != null)
+                    tutorial.Run(this, () => AppSettings.TutorialDone = true);
             }
             catch (Exception ex)
             {
@@ -234,6 +257,35 @@ namespace Obstetricia
         {
             if (_anchor != null && _anchor.trackingState == UnityEngine.XR.ARSubsystems.TrackingState.Tracking)
                 transform.SetPositionAndRotation(_anchor.transform.position, _anchor.transform.rotation);
+        }
+
+        private bool _requestedModuleOpened;
+
+        /// <summary>
+        /// Primera pantalla después del tutorial: si la página web pidió un programa (?modulo=fisio|legal)
+        /// se abre directamente; si no, la mesa UCEN.
+        /// </summary>
+        public void ShowStart()
+        {
+            if (!_requestedModuleOpened)
+            {
+                _requestedModuleOpened = true;
+                switch (WebBridge.RequestedModule)
+                {
+                    case "fisio":
+                    case "fisiobalon":
+                        ShowFisio();
+                        return;
+                    case "legal":
+                        ShowLegal();
+                        return;
+                    case "sala":
+                        if (sala == null) break;
+                        ShowSala();
+                        return;
+                }
+            }
+            ShowHub();
         }
 
         public void ShowHub()
@@ -360,7 +412,10 @@ namespace Obstetricia
                 Vector3 forward = Vector3.ProjectOnPlane(head.forward, Vector3.up).normalized;
                 if (forward.sqrMagnitude < 0.01f) forward = Vector3.forward;
                 float floorY = xrOrigin != null ? xrOrigin.transform.position.y : 0f;
-                Vector3 pos = head.position + forward * AppSettings.EffectiveDistance;
+                // En pantalla (modo escritorio) el campo de visión es menor que en el visor:
+                // la mesa se coloca más lejos para que se vean los paneles laterales completos.
+                float placeDistance = AppSettings.EffectiveDistance + (PlatformMode.IsDesktop ? DesktopExtraDistance : 0f);
+                Vector3 pos = head.position + forward * placeDistance;
                 pos.y = floorY + AppSettings.EffectiveHeight;
                 var pose = new Pose(pos, Quaternion.LookRotation(forward, Vector3.up));
 

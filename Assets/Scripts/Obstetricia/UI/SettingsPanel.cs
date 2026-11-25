@@ -55,7 +55,11 @@ namespace Obstetricia.UI
             _distance = Stepper(r, "Distancia", y, () => AppSettings.Distance -= 0.1f, () => AppSettings.Distance += 0.1f); y -= step;
             _left = Toggle(r, "Modo zurdo", "Lápiz con la mano izquierda", y, () => AppSettings.LeftHanded = !AppSettings.LeftHanded); y -= step;
             _sounds = Toggle(r, "Sonidos", "Efectos al tocar y elegir", y, () => AppSettings.Sounds = !AppSettings.Sounds); y -= step;
-            _narration = Toggle(r, "Narración por voz", "Lee en voz alta las situaciones", y, () => AppSettings.Narration = !AppSettings.Narration); y -= step;
+            _narration = Toggle(r, "Narración por voz", "Lee en voz alta las situaciones", y, () =>
+            {
+                AppSettings.Narration = !AppSettings.Narration;
+                if (!AppSettings.Narration) Narrator.Stop(); // que se calle de inmediato
+            }); y -= step;
 
             HoloUI.Text(r, "EstudianteLbl", "Estudiante", 19, new Vector2(-150, y), new Vector2(260, 30), TextAlignmentOptions.Left, HoloColors.Text, FontStyles.Bold);
             _student = HoloUI.Text(r, "EstudianteVal", "", 17, new Vector2(-150, y - 24), new Vector2(260, 26), TextAlignmentOptions.Left, HoloColors.Accent);

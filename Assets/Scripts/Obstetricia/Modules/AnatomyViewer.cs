@@ -136,8 +136,23 @@ namespace Obstetricia.Modules
         private void Awake()
         {
             if (head == null && Camera.main != null) head = Camera.main.transform;
+            if (Desktop.PlatformMode.IsDesktop) AddKeyboardRotation(rotateRight.action);
             Build();
             _root.SetActive(false);
+        }
+
+        /// <summary>Modo escritorio: I J K L hacen lo mismo que el joystick.</summary>
+        private static void AddKeyboardRotation(InputAction action)
+        {
+            if (action == null) return;
+            bool wasEnabled = action.enabled;
+            if (wasEnabled) action.Disable();
+            action.AddCompositeBinding("2DVector")
+                .With("Up", "<Keyboard>/i")
+                .With("Down", "<Keyboard>/k")
+                .With("Left", "<Keyboard>/j")
+                .With("Right", "<Keyboard>/l");
+            if (wasEnabled) action.Enable();
         }
 
         private void OnEnable()

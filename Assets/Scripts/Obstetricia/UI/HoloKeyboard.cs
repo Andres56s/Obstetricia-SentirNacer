@@ -1,6 +1,7 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Obstetricia.UI
 {
@@ -94,9 +95,40 @@ namespace Obstetricia.UI
             _field.text = _text + (blink ? "<color=#5FD3FF>|</color>" : " ");
         }
 
+        /// <summary>True mientras el teclado está abierto (el modo escritorio no mueve al jugador con WASD).</summary>
+        public static bool IsOpen => _instance != null && _instance._canvas != null && _instance._canvas.gameObject.activeSelf
+                                     && _instance._done != null;
+
+        private void OnEnable()
+        {
+            if (Keyboard.current != null) Keyboard.current.onTextInput += OnPhysicalKey;
+        }
+
+        private void OnDisable()
+        {
+            if (Keyboard.current != null) Keyboard.current.onTextInput -= OnPhysicalKey;
+        }
+
+        /// <summary>Modo escritorio: también se puede escribir con el teclado físico (Enter = Listo, Esc = Cancelar).</summary>
+        private void OnPhysicalKey(char c)
+        {
+            // Borrar, Enter y Esc se leen en Update (aquí solo letras y espacio, para no duplicarlos).
+            if (IsOpen && (char.IsLetter(c) || c == ' ')) Type(c);
+        }
+
         private void Update()
         {
-            if (_canvas != null && _canvas.gameObject.activeSelf) Refresh();
+            if (_canvas != null && _canvas.gameObject.activeSelf)
+            {
+                Refresh();
+                Keyboard kb = Keyboard.current;
+                if (kb != null && _done != null)
+                {
+                    if (kb.backspaceKey.wasPressedThisFrame) Backspace();
+                    else if (kb.enterKey.wasPressedThisFrame || kb.numpadEnterKey.wasPressedThisFrame) Accept();
+                    else if (kb.escapeKey.wasPressedThisFrame) Cancel();
+                }
+            }
         }
 
         private void Accept() => Close(_text.Trim());

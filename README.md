@@ -27,6 +27,34 @@ git clone <url-del-repositorio>
 2. Abre la escena `Assets/Scenes/SampleScene.unity`.
 3. Si algo falta en la escena, usa el menú **Tools > MR Setup > 5 - Construir experiencia Obstetricia**.
 
+## Modo escritorio (sin visor)
+
+La misma experiencia se puede usar **sin visor**, con teclado y mouse, dentro de la página web Sentir Nacer
+(Unity WebGL) o en el Editor. Se activa sola cuando no hay visor (`Assets/Scripts/Obstetricia/Desktop/PlatformMode.cs`):
+
+| Tecla | Acción |
+|---|---|
+| Mouse | Mirar (cursor bloqueado; Esc lo suelta, un clic lo vuelve a tomar) |
+| W A S D / flechas | Moverse (Shift para correr) |
+| E | Sala virtual: abrir / cerrar su menú (al elegir una opción se pliega solo) |
+| Clic izquierdo | Botones holográficos · mantener para tomar objetos |
+| Rueda del mouse | Acercar / alejar el objeto tomado |
+| Tab (mantener) + mouse | Rotar el objeto tomado |
+| H | Devolver el objeto a su lugar original |
+| I J K L | Girar la pelvis |
+| R (mantener) | Recentrar la mesa |
+| C | Mostrar / ocultar los controles |
+
+- `DesktopRig.cs` apaga el seguimiento XR, controles y manos, mueve el XR Origin con el teclado y agrega un
+  `XRRayInteractor` que sigue al mouse (los mismos botones y objetos agarrables de VR funcionan con clic).
+  Como no hay passthrough, crea una sala simple.
+- El balón kinésico se simula (`BallDetector.Begin`) y el teclado holográfico acepta el teclado físico.
+- `WebBridge.cs` + `Assets/Plugins/WebGL/ObstetriciaWebBridge.jslib`: lee `?modulo=fisio|legal|sala&alumno=...`
+  y envía los resultados a la página (que los guarda en Firestore). La narración usa la voz del navegador
+  (viene apagada; se activa en Ajustes > Narración por voz).
+- Menús: **Tools > Obstetricia > Modo escritorio en el Editor** y **Tools > Obstetricia > Construir versión Web (WebGL)**
+  (deja la build en `../web/public/unity` con la plantilla `Assets/WebGLTemplates/SentirNacer`).
+
 ## Probar
 
 - **En el Editor (Play):** con Quest Link activo como runtime OpenXR. Tecla **B**: simula la pelota.

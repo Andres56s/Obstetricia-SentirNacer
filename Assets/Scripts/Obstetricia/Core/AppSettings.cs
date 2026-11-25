@@ -48,10 +48,10 @@ namespace Obstetricia.Core
             set => SetBool("sounds", value);
         }
 
-        /// <summary>Narración por voz de las situaciones y pasos.</summary>
+        /// <summary>Narración por voz de las situaciones y pasos. Apagada por defecto: se activa en Ajustes.</summary>
         public static bool Narration
         {
-            get => GetBool("narration", true);
+            get => GetBool("narration", false);
             set => SetBool("narration", value);
         }
 

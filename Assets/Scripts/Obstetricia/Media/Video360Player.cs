@@ -37,7 +37,12 @@ namespace Obstetricia.Media
             _audio.spatialBlend = 0f;
             _player.SetTargetAudioSource(0, _audio);
             _player.prepareCompleted += OnPrepared;
-            _player.errorReceived += (vp, msg) => Debug.LogError($"[Obstetricia] Error de video 360: {msg}");
+            _player.errorReceived += (vp, msg) =>
+            {
+                Debug.LogError($"[Obstetricia] Error de video 360: {msg}");
+                // Sin video (archivo faltante o formato no soportado) se vuelve al entorno en vez de dejar la esfera negra.
+                Stop();
+            };
             BuildSphere();
             _sphere.SetActive(false);
         }

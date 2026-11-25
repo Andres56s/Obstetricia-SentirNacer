@@ -87,6 +87,13 @@ namespace Obstetricia.Detection
         public void Begin()
         {
             Running = true;
+            if (Desktop.PlatformMode.IsDesktop)
+            {
+                // Sin visor no hay cámara del entorno: el balón kinésico se simula y la pelvis aparece de inmediato.
+                SetSimulated(true);
+                StatusText = "Modo escritorio: balón simulado";
+                return;
+            }
             if (model == null)
             {
                 StatusText = Application.isEditor && simulateInEditor
