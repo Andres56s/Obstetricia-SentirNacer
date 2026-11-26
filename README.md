@@ -19,4 +19,4 @@ La **realidad inmersiva** (VR con Meta Quest o modo escritorio en el navegador) 
 unificado es la carpeta `../unity`). Su versión web se genera desde Unity con
 **Tools > Obstetricia > Construir versión Web (WebGL)** y queda en `public/unity/` (ver
 [public/unity/README.md](public/unity/README.md)). Este repo debe estar en una carpeta llamada `web`, al lado del
-proyecto Unity.
+proyecto Unity. Para armar todo en otro computador: [CONFIGURAR_OTRO_PC.md](CONFIGURAR_OTRO_PC.md).
