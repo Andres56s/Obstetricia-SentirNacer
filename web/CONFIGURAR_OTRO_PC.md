@@ -5,18 +5,20 @@ para pasársela a Claude Code: al final hay un [texto listo para pegarle](#texto
 
 ## Cómo está organizado
 
-El proyecto son **dos repositorios** que se clonan dentro de una misma carpeta:
+Todo el proyecto está en **un solo repositorio**: <https://github.com/Andres56s/Obstetricia-SentirNacer> (rama `main`).
 
 ```
 Obstetricia-SentirNacer/
-├── web/    ← github.com/Andres56s/Proyecto_obste   rama realidad-inmersiva   (página: React + Vite + Firebase)
-└── unity/  ← github.com/lNubet/Obstetricia-VR      rama modo-escritorio-web  (experiencia VR + modo escritorio)
+├── web/    página: React + Vite + Firebase
+└── unity/  experiencia VR (Meta Quest) + modo escritorio (Unity WebGL)
 ```
 
 - Los nombres de las carpetas importan: Unity guarda la versión web en `../web/public/unity` (al lado de `unity/`).
-- Cada carpeta es su propio repositorio: los cambios de la página se suben desde `web/` y los de Unity desde `unity/`.
-- **No se trabaja en `main`** de ninguno de los dos: todo va en las ramas indicadas hasta probarlo en las Quest.
-  El repo de Unity es del compañero (lNubet); su `main` lo junta él con un pull request.
+- Se trabaja y se sube todo desde la raíz del repo (`git push` sube web y unity juntos).
+- **El compañero (lNubet)** tiene su propio repo de Unity: <https://github.com/lNubet/Obstetricia-VR>. Para pasarle
+  los cambios de `unity/` hay que subirlos a su rama `modo-escritorio-web` (ver el paso 6); su `main` lo junta él.
+  La página también existe en <https://github.com/Andres56s/Proyecto_obste> (rama `realidad-inmersiva`), que quedó
+  como versión anterior.
 
 ## 1. Instalar programas
 
@@ -32,20 +34,18 @@ Obstetricia-SentirNacer/
 
 Abre una terminal nueva después de instalar (para que reconozca `git`, `node` y `npm`).
 
-## 2. Clonar los dos repositorios
+## 2. Clonar el repositorio
 
 En PowerShell, desde donde quieras dejar el proyecto (por ejemplo el Escritorio):
 
 ```powershell
 git lfs install
-mkdir Obstetricia-SentirNacer
+git clone https://github.com/Andres56s/Obstetricia-SentirNacer.git
 cd Obstetricia-SentirNacer
-git clone -b realidad-inmersiva https://github.com/Andres56s/Proyecto_obste.git web
-git clone -b modo-escritorio-web https://github.com/lNubet/Obstetricia-VR.git unity
 ```
 
-Para **subir** cambios, la cuenta de GitHub debe tener permiso en cada repo (Andres56s ya es colaborador del de
-Unity). La primera vez que hagas `git push`, Git abre una ventana para iniciar sesión en GitHub.
+Si el repo es privado, Git abre una ventana para iniciar sesión en GitHub (cuenta **Andres56s**). Pesa unos
+220 MB (los modelos de Unity se bajan con Git LFS).
 
 ## 3. Claves de Firebase (`web/.env.local`)
 
@@ -100,14 +100,13 @@ git checkout -- ProjectSettings/ProjectSettings.asset ProjectSettings/UnityConne
 
 ## 6. Trabajar día a día
 
-Antes de empezar, trae lo último de los dos repos:
+Antes de empezar, trae lo último (desde la raíz `Obstetricia-SentirNacer`):
 
 ```powershell
-git -C web pull
-git -C unity pull
+git pull
 ```
 
-Para subir cambios, en la carpeta que corresponda (`web` o `unity`):
+Para subir cambios (web y unity juntos), desde la raíz:
 
 ```powershell
 git status
@@ -115,6 +114,11 @@ git add -A
 git commit -m "qué cambió"
 git push
 ```
+
+**Pasarle los cambios de Unity al compañero** (cuando se quiera que los pruebe en sus Quest): clonar
+<https://github.com/lNubet/Obstetricia-VR> en una carpeta temporal, cambiarse a la rama `modo-escritorio-web`,
+copiar encima el contenido de `unity/`, revisar el diff (sin ajustes de XR borrados, ver el aviso del paso 5),
+hacer commit y push a esa rama. Claude Code puede hacerlo si se le pide. Nunca subir a su `main`.
 
 Revisa con `git status` que no aparezcan `.env.local`, `node_modules/`, `Library/` ni `public/unity/` (la build):
 todos están ignorados, pero conviene mirarlo.
@@ -147,9 +151,10 @@ Para quien retome el trabajo (persona o Claude):
     `BPlModwMZG4` para «Ver video» y el archivo `web/public/videos360/practica-fisiobalon.mp4` (30 MB) para «Ver en VR».
   - Los profesores pueden agregar más con «Agregar video 360°» (se guardan en `courses/{id}.practica`).
   - Ya no se muestra el «Test práctico» (las preguntas siguen en `practicaTest`, solo ocultas).
-- **Preferencias del usuario (Andrés)**: habla español; prefiere que se trabaje desde la carpeta
-  `Obstetricia-SentirNacer`; hay que preguntarle antes de subir a GitHub, de tocar la base de datos real o de
-  cambiar algo fuera de lo que pidió; los cambios grandes se prueban en el navegador antes de entregarlos.
+- **Preferencias del usuario (Andrés)**: habla español; se trabaja en un solo repo,
+  `Andres56s/Obstetricia-SentirNacer` (rama `main`, carpeta `Obstetricia-SentirNacer`); hay que preguntarle antes
+  de subir a GitHub, de tocar la base de datos real o de cambiar algo fuera de lo que pidió; los cambios grandes se
+  prueban en el navegador antes de entregarlos.
 - **Pendiente**:
   - Probar «Ver en VR» del Práctico con las Quest conectadas por Quest Link (no se ha probado con visor real).
   - Publicar las reglas de `web/firestore.rules` (colección `immersiveResults`) en Firebase: cambian la base de
@@ -157,24 +162,24 @@ Para quien retome el trabajo (persona o Claude):
   - Que el compañero pruebe la rama `modo-escritorio-web` en las Quest (maletín, modo escritorio) y la junte con su `main`.
   - Videos 360° del programa Fisio en Unity (`unity/Assets/StreamingAssets/Videos360/*.mp4`): no están en el repo,
     los tiene el compañero.
-  - Juntar `realidad-inmersiva` con `main` en el repo de la página cuando todo esté probado, y publicar la página
-    (WebXR necesita https para usar el visor desde una página publicada).
+  - Publicar la página cuando todo esté probado (WebXR necesita https para usar el visor desde una página publicada).
 
 ## Texto para Claude Code
 
-Si usas Claude Code en el otro computador, abre una sesión en la carpeta donde quieras el proyecto y pégale esto:
+Si usas Claude Code en el otro computador, abre una sesión en la carpeta donde quieras el proyecto (por ejemplo
+el Escritorio) y pégale esto:
 
 ```text
 Quiero dejar funcionando en este computador el proyecto Sentir Nacer (página web + experiencia Unity VR)
-y seguir trabajando en él desde aquí.
-Lee primero la guía completa:
-https://github.com/Andres56s/Proyecto_obste/blob/realidad-inmersiva/CONFIGURAR_OTRO_PC.md
-y síguela paso a paso: revisa qué programas ya están instalados e instala los que falten (pídeme permiso
-antes de instalar y avísame cuando tenga que aceptar algo yo, como la licencia de Android en Unity Hub),
-crea la carpeta Obstetricia-SentirNacer con los dos repos clonados en sus ramas (web y unity), y dime
-cuándo copiar mi archivo .env.local. Después levanta la página, genera la versión web de Unity y
-pruébala en el navegador (la mesa UCEN con el maletín, y el Práctico de Fisio-balón con sus videos 360°).
+y seguir trabajando en él desde aquí. Está todo en el repo https://github.com/Andres56s/Obstetricia-SentirNacer
+1. Si no están, instala Git y Git LFS (pídeme permiso antes de instalar), ejecuta "git lfs install" y clona
+   ese repo aquí. Si GitHub pide iniciar sesión, avísame para hacerlo yo.
+2. Lee completa la guía web/CONFIGURAR_OTRO_PC.md del repo y síguela paso a paso: revisa qué programas ya
+   están instalados e instala los que falten (pídeme permiso antes y avísame cuando tenga que aceptar algo
+   yo, como la licencia de Android en Unity Hub), y dime cuándo copiar mi archivo web/.env.local.
+3. Levanta la página, genera la versión web de Unity y pruébala en el navegador (la mesa UCEN con el
+   maletín, y el Práctico de Fisio-balón con sus videos 360°).
 Lee también la sección "Estado del proyecto" de la guía: es el contexto de todo lo que ya está hecho,
 lo que falta y cómo prefiero trabajar. Guárdalo en tu memoria para las próximas sesiones.
-No subas nada a GitHub, no toques la base de datos real de Firebase ni hagas cambios en main sin preguntarme.
+No subas nada a GitHub ni toques la base de datos real de Firebase sin preguntarme.
 ```

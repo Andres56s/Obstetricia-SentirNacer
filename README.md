@@ -4,14 +4,16 @@ Proyecto unificado de la plataforma educativa **Sentir Nacer** y su experiencia 
 
 ```
 Obstetricia-SentirNacer/
-├─ web/     Página web (React + Vite + Tailwind + Firebase)    repo Andres56s/Proyecto_obste, rama realidad-inmersiva
-└─ unity/   Experiencia inmersiva (Unity 6000.3.27f1)          repo lNubet/Obstetricia-VR,   rama modo-escritorio-web
+├─ web/     Página web (React + Vite + Tailwind + Firebase)
+└─ unity/   Experiencia inmersiva (Unity 6000.3.27f1): VR para Meta Quest + modo escritorio (WebGL)
 ```
 
-Este repositorio reúne **el proyecto completo** (las dos partes con todo su historial), para tenerlo en un solo
-lugar. Los modelos, texturas y audio de `unity/` se guardan con **Git LFS** (`git lfs install` antes de clonar).
+Este es **el repositorio principal de trabajo**: reúne el proyecto completo (las dos partes con todo su historial)
+en un solo lugar. Se clona, se trabaja y se sube todo desde aquí (rama `main`).
+Los modelos, texturas y audio de `unity/` se guardan con **Git LFS** (`git lfs install` antes de clonar).
 
-Para trabajar en el día a día y en otro computador: [web/CONFIGURAR_OTRO_PC.md](web/CONFIGURAR_OTRO_PC.md).
+Para armarlo en otro computador y el trabajo del día a día: [web/CONFIGURAR_OTRO_PC.md](web/CONFIGURAR_OTRO_PC.md).
+`unity/` también se comparte con el compañero en <https://github.com/lNubet/Obstetricia-VR> (rama `modo-escritorio-web`).
 
 ## Dos formas de vivir la experiencia inmersiva
 
