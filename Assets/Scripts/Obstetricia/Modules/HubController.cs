@@ -35,7 +35,11 @@ namespace Obstetricia.Modules
         private Color _rimColor;
         private Coroutine _anim;
         private LogoAnimado _logo;
+        private MaletinSala _maletin;
         private bool _logoVisto;
+
+        [SerializeField, Tooltip("Lugar (m, espacio de la mesa) de la columna con el maletín Sentir Nacer: a la izquierda del usuario.")]
+        private Vector3 maletinLocal = new Vector3(-0.85f, 0f, -0.12f);
         private readonly List<(Transform t, Vector3 pos, Quaternion rot)> _flotan = new List<(Transform, Vector3, Quaternion)>();
         private readonly List<Transform> _anillos = new List<Transform>();
         private readonly List<SpriteRenderer> _luces = new List<SpriteRenderer>();
@@ -91,6 +95,7 @@ namespace Obstetricia.Modules
             _cards.SetActive(false);
             _pedestal.SetActive(false);
             if (_logo != null) _logo.Ocultar();
+            if (_maletin != null) _maletin.Reiniciar();
             if (_hint != null) _hint.SetActive(false);
         }
 
@@ -98,6 +103,7 @@ namespace Obstetricia.Modules
         {
             HoloFeedback.Play(HoloFeedback.Sound.Open, 0.7f);
             if (_logo != null) _logo.Ocultar();
+            if (_maletin != null) _maletin.Reiniciar();
             if (_hint != null) _hint.SetActive(false);
             yield return ScalePedestal(0f, 1f, 0.45f, true);
             if (_logo != null)
@@ -109,6 +115,7 @@ namespace Obstetricia.Modules
                 while (!listo) yield return null;
             }
             _cards.SetActive(true);
+            if (_maletin != null) _maletin.MostrarAyuda(true);
             if (_hint != null) _hint.SetActive(!_hintDismissed);
             _anim = null;
         }
@@ -117,6 +124,7 @@ namespace Obstetricia.Modules
         {
             HoloFeedback.Play(HoloFeedback.Sound.Close, 0.6f);
             if (_logo != null) _logo.Despedir();
+            if (_maletin != null) _maletin.Reiniciar();
             foreach (Transform child in _cards.transform) HoloAppear.HideObject(child.gameObject);
             yield return new WaitForSecondsRealtime(0.15f);
             yield return ScalePedestal(1f, 0f, 0.3f, false);
@@ -246,6 +254,17 @@ namespace Obstetricia.Modules
 
             BuildLogo();
             BuildMesaFx();
+            BuildMaletin();
+        }
+
+        /// <summary>Columna aparte con el maletín Sentir Nacer; al abrirlo aparece el acceso a la sala virtual.</summary>
+        private void BuildMaletin()
+        {
+            // El frente del maletín (la manilla) mira hacia donde está el usuario.
+            Vector3 haciaUsuario = new Vector3(viewerLocal.x - maletinLocal.x, 0f, viewerLocal.z - maletinLocal.z);
+            float yaw = Quaternion.LookRotation(-haciaUsuario.normalized, Vector3.up).eulerAngles.y;
+            _maletin = MaletinSala.Crear(_pedestal.transform, theme, maletinLocal, yaw, pedestalHeight, 0.3f);
+            _maletin.SalaElegida += () => SalaSelected?.Invoke();
         }
 
         private void BuildLogo()
@@ -376,19 +395,7 @@ namespace Obstetricia.Modules
             BuildCard(fisio, new Vector3(-dx, cy, dz + cardsDepth), angle, () => FisioSelected?.Invoke());
             BuildCard(legal, new Vector3(dx, cy, dz + cardsDepth), -angle, () => LegalSelected?.Invoke());
 
-            // Acceso a la sala virtual, sobre las dos tarjetas.
-            Canvas sala = HoloUI.CreateCanvas(_cards.transform, "SalaVirtual", new Vector2(560, 92));
-            sala.transform.localPosition = new Vector3(0f, cardsBottom + CardHeight * HoloUI.MillimeterScale + 0.075f, cardsDepth + 0.04f);
-            HoloUI.Button(sala.transform, "EntrarSala", "SALA VIRTUAL DE OBSTETRICIA", Vector2.zero, new Vector2(560, 84), () => SalaSelected?.Invoke(), "home", 23);
-            RectTransform marco = HoloUI.Rect(sala.transform.Find("EntrarSala"), "Marco", Vector2.zero, new Vector2(536, 76));
-            marco.gameObject.AddComponent<RectMask2D>();
-            _destello = HoloUI.Rect(marco, "Destello", new Vector2(-420f, 0f), new Vector2(200, 60));
-            _destello.localRotation = Quaternion.Euler(0f, 0f, 72f);
-            var brillo = _destello.gameObject.AddComponent<Image>();
-            brillo.sprite = HoloSprites.Scan;
-            brillo.color = new Color(0.6f, 0.92f, 1f, 0.35f);
-            brillo.raycastTarget = false;
-            _flotan.Add((sala.transform, sala.transform.localPosition, sala.transform.localRotation));
+            // El acceso a la sala virtual está dentro del maletín Sentir Nacer (columna de la izquierda, ver BuildMaletin).
 
             // Emblema circular en la unión inferior de las tarjetas.
             Canvas emblem = HoloUI.CreateCanvas(_cards.transform, "Emblema", new Vector2(64, 64));

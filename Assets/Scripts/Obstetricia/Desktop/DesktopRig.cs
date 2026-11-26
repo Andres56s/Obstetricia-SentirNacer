@@ -292,8 +292,9 @@ namespace Obstetricia.Desktop
 
             var panel = new GameObject("Panel", typeof(RectTransform)).GetComponent<RectTransform>();
             panel.SetParent(canvasGo.transform, false);
-            panel.anchorMin = panel.anchorMax = panel.pivot = new Vector2(0f, 0f);
-            panel.anchoredPosition = new Vector2(16f, 16f);
+            // Abajo a la derecha: a la izquierda quedan el maletín Sentir Nacer y la guía rápida.
+            panel.anchorMin = panel.anchorMax = panel.pivot = new Vector2(1f, 0f);
+            panel.anchoredPosition = new Vector2(-16f, 16f);
             panel.sizeDelta = new Vector2(370f, 240f);
             var bg = panel.gameObject.AddComponent<Image>();
             bg.color = new Color(0.03f, 0.08f, 0.18f, 0.78f);

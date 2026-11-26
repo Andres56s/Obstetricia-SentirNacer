@@ -14,6 +14,9 @@ La versión para las Quest **sigue funcionando igual**: el modo escritorio solo 
 - **Versión web**: plantilla `Assets/WebGLTemplates/SentirNacer`, puente con la página
   (`WebBridge.cs` + `Assets/Plugins/WebGL/ObstetriciaWebBridge.jslib`) y el menú
   **Tools > Obstetricia > Construir versión Web (WebGL)**.
+- **Maletín Sentir Nacer** (`Assets/Scripts/Obstetricia/Modules/MaletinSala.cs`, en VR y web): en una columna
+  aparte a la izquierda de la mesa UCEN. Al abrirlo aparece el botón **SALA VIRTUAL DE OBSTETRICIA** (reemplaza
+  al botón flotante que había sobre las tarjetas). Su lugar se ajusta en `HubController` > `maletinLocal`.
 - **Sala virtual en escritorio**: el menú se despliega con la tecla **E** y se pliega al elegir una opción
   (en VR queda como siempre, a un costado).
 - **Tutorial** con textos de teclado y mouse cuando no hay visor.
@@ -48,6 +51,9 @@ Haz tu build para Android como siempre y revisa:
 
 - [ ] Tutorial con manos y con controles.
 - [ ] Mesa UCEN, programa Fisio-balón (pelvis, mecanismos, evaluación) y programa Legal.
+- [ ] Maletín Sentir Nacer a la izquierda: abrirlo con su botón (gatillo / pellizco), agarrándolo o tocándolo;
+      que la tapa no atraviese nada, que se vea el interior y que «SALA VIRTUAL DE OBSTETRICIA» lleve a la sala.
+      Al volver de la sala debe aparecer cerrado.
 - [ ] Sala virtual: entrar, moverse por los círculos del piso, menú a un costado, pelvis, guatero, salir.
 - [ ] La voz viene apagada; al activarla en Ajustes debe narrar, y al apagarla debe callarse de inmediato.
 - [ ] Recentrar (botón Meta / menú) sigue funcionando.

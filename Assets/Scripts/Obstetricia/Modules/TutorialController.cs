@@ -369,7 +369,8 @@ namespace Obstetricia.Modules
             if (fwd.sqrMagnitude < 0.01f) fwd = Vector3.forward;
             // A la izquierda para dejar libre la mano derecha (al revés en modo zurdo).
             // En pantalla el campo de visión es menor que en el visor: la ventana se acerca al centro para que no se corte.
-            float side = PlatformMode.IsDesktop ? CostadoEscritorio : Costado;
+            // En escritorio va a la derecha: a la izquierda está el maletín Sentir Nacer.
+            float side = PlatformMode.IsDesktop ? -CostadoEscritorio : Costado;
             Vector3 dir = Quaternion.Euler(0f, AppSettings.LeftHanded ? side : -side, 0f) * fwd;
             _pos = cam.transform.position + dir * Distancia + Vector3.down * 0.1f;
             if (!now) return;
