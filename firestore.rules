@@ -8,6 +8,7 @@
 //
 //   TODO requiere haber iniciado sesión (no hay contenido público).
 //   alumno   -> lee cursos; guarda SU resultado de la Prueba (solo si no está bloqueada)
+//               y SUS resultados de la experiencia inmersiva
 //   profesor -> CRUD de cursos y bloques de inicio; ve resultados; autoriza repetir pruebas
 //   admin    -> todo lo anterior + orden de cursos + gestión de usuarios + edita textos de la portada
 // =====================================================================
@@ -71,6 +72,20 @@ service cloud.firestore {
                     || (isStaff()
                         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['retakeAllowed']));
 
+      allow delete: if isAdmin();
+    }
+
+    // Resultados de la EXPERIENCIA INMERSIVA (Unity en el navegador, modo escritorio).
+    // Intentos ilimitados: cada evaluación terminada es un documento nuevo que no se edita.
+    match /immersiveResults/{resultId} {
+      allow read: if signedIn() && (resource.data.uid == request.auth.uid || isStaff());
+      allow create: if signedIn()
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.total is int
+                    && request.resource.data.correct is int
+                    && request.resource.data.correct >= 0
+                    && request.resource.data.correct <= request.resource.data.total;
+      allow update: if false;
       allow delete: if isAdmin();
     }
   }

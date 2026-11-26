@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import {
   subscribeCourses, subscribeCourse, subscribeSiteBlocks, subscribeResults, subscribeResult, subscribeUsers,
+  subscribeImmersiveResults,
 } from '../services/db';
 
 const useLive = (subscribe, key) => {
@@ -37,4 +38,7 @@ export const useResults = (user, isStaff) =>
 // Resultado de la prueba final de un alumno en un curso (pasa user=null para no suscribirse).
 export const useResult = (user, courseId) =>
   useLive(user ? subscribeResult(user.uid, courseId) : null, `result-${user?.uid}-${courseId}`);
+// Resultados de la experiencia inmersiva (modo escritorio).
+export const useImmersiveResults = (user, isStaff) =>
+  useLive(user ? subscribeImmersiveResults(user, isStaff) : null, `immersive-${user?.uid}-${isStaff}`);
 export const useUsers =(enabled) => useLive(enabled ? subscribeUsers : null, `users-${enabled}`);

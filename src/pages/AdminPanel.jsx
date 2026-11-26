@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PlusCircle, Edit, Trash2, ArrowUp, ArrowDown, ExternalLink, UserPlus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useCourses, useResults, useUsers } from '../hooks/useFirestore';
+import { useCourses, useResults, useUsers, useImmersiveResults } from '../hooks/useFirestore';
 import {
   deleteCourse, swapCourseOrder, seedCourses, setUserRole, setRetakeAllowed,
   createUserAccount, deleteUserProfile,
@@ -16,7 +16,8 @@ import { ROLES, ROLE_LABELS } from '../constants';
 // =====================================================================
 //   Pestaña "Cursos"     -> CRUD de cursos (profesor y admin).
 //                           Las flechas para MOVER el orden solo las ve el admin.
-//   Pestaña "Resultados" -> notas de la Prueba final + interruptor "Repetir" (profesor y admin).
+//   Pestaña "Resultados" -> notas de la Prueba final + interruptor "Repetir" (profesor y admin)
+//                           + evaluaciones hechas dentro de la experiencia inmersiva.
 //   Pestaña "Usuarios"   -> crear cuentas, cambiar roles y revocar accesos (solo admin).
 // =====================================================================
 const th = 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider';
@@ -169,6 +170,51 @@ const CoursesTab = ({ isAdmin }) => {
 };
 
 // ---------------------------------------------------------------------
+// TABLA: RESULTADOS DE LA EXPERIENCIA INMERSIVA (Unity en el navegador)
+// ---------------------------------------------------------------------
+const ImmersiveResultsTable = ({ user }) => {
+  const { data, loading } = useImmersiveResults(user, true);
+  const list = data || [];
+  return (
+    <>
+      <h2 className="text-lg font-semibold text-gray-800 mt-10 mb-3">Realidad inmersiva (modo escritorio)</h2>
+      <div className="bg-white rounded-lg shadow border border-gray-200 overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className={th}>Alumno</th>
+              <th className={th}>Curso</th>
+              <th className={th}>Evaluación</th>
+              <th className={th}>Correctas</th>
+              <th className={th}>Fecha</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {loading && <tr><td colSpan={5} className="px-6 py-6 text-center text-gray-500">Cargando...</td></tr>}
+            {!loading && list.length === 0 && (
+              <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-500">Aún no hay evaluaciones inmersivas.</td></tr>
+            )}
+            {list.map((r) => (
+              <tr key={r.id} className="hover:bg-gray-50">
+                <td className={`${td} text-sm text-gray-900`}>{r.userName}</td>
+                <td className={`${td} text-sm text-gray-600`}>{r.courseTitle}</td>
+                <td className={`${td} text-sm text-gray-600`}>{r.module}</td>
+                <td className={`${td} text-sm font-semibold text-gray-700`}>{r.correct}/{r.total} ({r.percent}%)</td>
+                <td className={`${td} text-sm text-gray-500`}>{r.createdAt?.toDate().toLocaleString('es-CL') ?? '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="text-xs text-gray-400 mt-3">
+        Evaluaciones terminadas dentro de la experiencia en el navegador (intentos ilimitados). Los resultados hechos
+        con el visor Meta Quest quedan en el archivo resultados_obstetricia.csv del visor.
+      </p>
+    </>
+  );
+};
+
+// ---------------------------------------------------------------------
 // PESTAÑA: RESULTADOS (con el permiso para repetir la prueba)
 // ---------------------------------------------------------------------
 const ResultsTab = ({ user }) => {
@@ -235,6 +281,8 @@ const ResultsTab = ({ user }) => {
         La Prueba final se rinde una sola vez. Activa «Permitir repetir» para que ese alumno pueda volver a rendirla;
         el permiso se consume al enviar el nuevo intento. El test del apartado Práctico no necesita permiso (intentos ilimitados).
       </p>
+
+      <ImmersiveResultsTable user={user} />
     </>
   );
 };

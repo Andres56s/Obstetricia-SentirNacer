@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import Lesson from './pages/Lesson';
 import CourseBlocksPage from './pages/CourseBlocksPage';
 import CoursePrueba from './pages/CoursePrueba';
+import ImmersivePage from './pages/ImmersivePage';
 import AdminPanel from './pages/AdminPanel';
 import AuthForm from './components/AuthForm';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -87,6 +88,8 @@ function AppShell() {
             <CourseBlocksPage section="practica" title="Práctico" emptyText="Aún no hay actividades prácticas en este curso." />
           } />
           <Route path="/curso/:id/prueba" element={<CoursePrueba />} />
+          {/* Realidad inmersiva: con visor VR (Meta Quest) o en el navegador (modo escritorio) */}
+          <Route path="/curso/:id/inmersivo" element={<ImmersivePage />} />
 
           {/* Panel del alumno */}
           <Route path="/dashboard" element={

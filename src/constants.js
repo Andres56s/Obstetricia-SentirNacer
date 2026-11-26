@@ -29,3 +29,26 @@ export const PASS_PERCENT = 60;
 // el examen se envía solo con lo que el alumno haya respondido.
 // (El test del apartado Práctico nunca tiene límite de tiempo ni de intentos.)
 export const FINAL_EXAM_TIME_LIMIT_MIN = 0;
+
+// ---------------------------------------------------------------------
+// REALIDAD INMERSIVA (proyecto Unity de la carpeta ../unity)
+// ---------------------------------------------------------------------
+// Programas de la experiencia Unity que un curso inmersivo puede abrir directamente.
+// `id` es el valor que recibe Unity en la URL (?modulo=...). Vacío = la mesa UCEN (el alumno elige).
+export const IMMERSIVE_MODULES = [
+  { id: '', label: 'Mesa UCEN (el alumno elige el programa)' },
+  { id: 'fisio', label: 'Programa Fisio-balón (pelvis 3D, mecanismos del parto, evaluación)' },
+  { id: 'legal', label: 'Programa Legal (Ley Integral de la Mujer)' },
+  { id: 'sala', label: 'Sala virtual de obstetricia (cama de parto, monitor fetal, Apgar, musicoterapia)' },
+];
+
+export const immersiveModuleLabel = (id) =>
+  (IMMERSIVE_MODULES.find((m) => m.id === (id || '')) || IMMERSIVE_MODULES[0]).label;
+
+// Dónde queda la versión web (WebGL) del proyecto Unity. Unity la genera con
+// "Tools > Obstetricia > Construir versión Web (WebGL)" dentro de web/public/unity.
+export const UNITY_WEB_PATH = '/unity/index.html';
+
+// Enlace opcional para descargar la app de las Meta Quest (APK). Se configura en .env.local:
+// VITE_QUEST_APP_URL=https://...
+export const QUEST_APP_URL = import.meta.env.VITE_QUEST_APP_URL || '';

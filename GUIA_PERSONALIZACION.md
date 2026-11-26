@@ -72,6 +72,14 @@ Ambas usan `components/QuizSection.jsx`; la diferencia es la prop `isFinal`.
 **Permiso del profesor:** Panel > **Resultados** > columna **«Permitir repetir»** (interruptor por alumno y curso). Activado, el alumno puede rendir **una vez más**; al enviar, el permiso se consume y la prueba se bloquea de nuevo. Esto lo hacen cumplir también las reglas de Firestore, no solo la pantalla.
 Profesores y administradores pueden abrir la Prueba para revisarla sin que se guarde nada.
 
+### Realidad inmersiva (VR y modo escritorio)
+- Un curso con la casilla **«Realidad Inmersiva»** muestra el botón **Realidad inmersiva** → `/curso/:id/inmersivo` (`pages/ImmersivePage.jsx`).
+- Ahí el alumno elige **Con visor VR** (app de Meta Quest) o **Sin visor**: la experiencia Unity corre dentro de la página (`components/ImmersivePlayer.jsx`, iframe a `/unity/index.html`).
+- **Qué programa abre** cada curso: Panel > Cursos > Editar > «Programa de la experiencia inmersiva» (`immersiveModule`: mesa UCEN, `fisio`, `legal` o `sala`).
+- Al terminar una evaluación dentro de la experiencia, Unity avisa a la página y el resultado de un alumno se guarda en `immersiveResults` (intentos ilimitados). Se ve en **Panel > Resultados**, debajo de las pruebas.
+- La versión web de Unity se genera desde Unity: **Tools > Obstetricia > Construir versión Web (WebGL)** (queda en `public/unity/`). Si no existe, la página muestra un aviso.
+- Botón para descargar la app del visor: pon el enlace del APK en `.env.local` como `VITE_QUEST_APP_URL`.
+
 ---
 
 ## 3. Qué puede hacer cada rol
@@ -102,7 +110,7 @@ src/
 ├─ hooks/                      useFirestore.js (datos en vivo), useClickOutside.js
 ├─ utils/                      search.js (buscador), video.js (enlaces de YouTube)
 ├─ App.jsx                     Route Guard global y rutas por rol
-├─ pages/                      Home, Lesson, CourseBlocksPage, CoursePrueba, Dashboard, AdminPanel
+├─ pages/                      Home, Lesson, CourseBlocksPage, CoursePrueba, ImmersivePage, Dashboard, AdminPanel
 └─ components/                 Navbar, SearchBox, QuizSection, Editable, AuthForm, modales...
 ```
 
@@ -116,6 +124,8 @@ src/
 | Un texto de la portada | **Sin código:** Inicio > «Editar página» (admin). Texto base: el `def` en `pages/Home.jsx` o `components/HeroSection.jsx` |
 | Agregar un texto editable nuevo | Usa `<EditableText id="nombre_nuevo" def="..." />` |
 | Textos de los 3 botones (Teórico/Práctico/Prueba) | `pages/Lesson.jsx` → lista `SECTIONS` |
+| Instrucciones de VR / controles del modo escritorio | `pages/ImmersivePage.jsx` → `VR_STEPS` y `DESKTOP_CONTROLS` |
+| Programas inmersivos disponibles | `constants.js` → `IMMERSIVE_MODULES` (el `id` debe existir en Unity: `ObstetriciaApp.ShowStart`) |
 | Mensajes de error del login | `components/AuthForm.jsx` → `AUTH_ERRORS` |
 | Título/descripción/imagen de un curso | Panel > Cursos > |
 | Nombre mostrado de cada rol | `constants.js` → `ROLE_LABELS` |

@@ -23,6 +23,10 @@ dist-ssr
 *.sln
 *.sw?
 
+# Build WebGL de Unity (se genera con Tools > Obstetricia > Construir versión Web)
+public/unity/*
+!public/unity/README.md
+
 # Python
 venv/
 backend/venv/

@@ -9,13 +9,16 @@
 // Estructura de la base de datos:
 //   users/{uid}            -> { name, email, role }                 (perfil + rol)
 //   courses/{id}           -> { title, image, videoUrl, author, description, evaluation,
-//                               isImmersive, order,
+//                               isImmersive, immersiveModule, order,
 //                               teoria:[bloques], practica:[bloques],
 //                               practicaTest:[preguntas], prueba:[preguntas] }
 //   siteBlocks/{id}        -> { title, text, imageUrl, order }      (bloques de la página de inicio)
 //   siteContent/home       -> { texts: { clave: valor } }           (textos editables de la portada)
 //   results/{uid_cursoId}  -> { uid, userName, courseId, courseTitle, score, total, percent,
 //                               attempts, retakeAllowed }           (resultado de la PRUEBA final)
+//   immersiveResults/{id}  -> { uid, userName, courseId, courseTitle, module, correct, total,
+//                               score, percent, mode }              (evaluaciones hechas dentro de la
+//                                                                    experiencia inmersiva, modo escritorio)
 // =====================================================================
 import {
   collection, doc, onSnapshot, query, orderBy, where,
@@ -32,6 +35,7 @@ const BLOCKS = 'siteBlocks';
 const RESULTS = 'results';
 const USERS = 'users';
 const SITE_CONTENT = 'siteContent';
+const IMMERSIVE_RESULTS = 'immersiveResults';
 
 const withId = (d) => ({ id: d.id, ...d.data() });
 
@@ -48,6 +52,7 @@ const COURSE_DEFAULTS = {
   description: '',
   evaluation: '',
   isImmersive: false,
+  immersiveModule: '', // programa de Unity que abre el curso: '' (mesa UCEN) | 'fisio' | 'legal'
   teoria: [], // apartado Teórico: lista de bloques {id, title, text, imageUrl, videoUrl}
   practica: [], // apartado Práctico: lista de bloques {id, title, text, link}
   practicaTest: [], // test del apartado Práctico (intentos ilimitados): lista de preguntas
@@ -159,6 +164,34 @@ export const subscribeResults = (user, isStaff) => (onData, onError) => {
 // Interruptor del profesor: permite (true) o impide (false) que el alumno repita la prueba.
 export const setRetakeAllowed = (resultId, allowed) =>
   updateDoc(doc(db, RESULTS, resultId), { retakeAllowed: allowed });
+
+// ---------------------------------------------------------------------
+// RESULTADOS DE LA EXPERIENCIA INMERSIVA (Unity WebGL, modo escritorio)
+// ---------------------------------------------------------------------
+// Unity avisa con postMessage cuando el alumno termina una evaluación dentro de la experiencia
+// (ver components/ImmersivePlayer.jsx). Cada intento es un documento nuevo (intentos ilimitados).
+export const saveImmersiveResult = (user, course, { module, correct, total, score }) =>
+  addDoc(collection(db, IMMERSIVE_RESULTS), {
+    uid: user.uid,
+    userName: user.name,
+    courseId: course.id,
+    courseTitle: course.title,
+    module: String(module || '').slice(0, 80),
+    correct,
+    total,
+    score,
+    percent: total ? Math.round((correct / total) * 100) : 0,
+    mode: 'escritorio',
+    createdAt: serverTimestamp(),
+  });
+
+// Profesores/Admin ven todos; el alumno solo los suyos.
+export const subscribeImmersiveResults = (user, isStaff) => (onData, onError) => {
+  const q = isStaff
+    ? query(collection(db, IMMERSIVE_RESULTS), orderBy('createdAt', 'desc'))
+    : query(collection(db, IMMERSIVE_RESULTS), where('uid', '==', user.uid));
+  return onSnapshot(q, (snap) => onData(snap.docs.map(withId)), onError);
+};
 
 // ---------------------------------------------------------------------
 // USUARIOS (gestión de accesos, solo Administrador)

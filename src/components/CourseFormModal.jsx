@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Modal, { Field, FormActions, inputClass } from './Modal';
 import { createCourse, updateCourse } from '../services/db';
+import { IMMERSIVE_MODULES } from '../constants';
 
 // =====================================================================
 // FORMULARIO PARA CREAR / EDITAR UN CURSO  (CRUD: "C" y "U")
@@ -14,6 +15,7 @@ import { createCourse, updateCourse } from '../services/db';
 // =====================================================================
 const EMPTY = {
   title: '', image: '', videoUrl: '', author: '', description: '', evaluation: '', isImmersive: false,
+  immersiveModule: '',
 };
 
 const CourseFormModal = ({ course, nextOrder = 0, onClose }) => {
@@ -69,8 +71,17 @@ const CourseFormModal = ({ course, nextOrder = 0, onClose }) => {
             onChange={(e) => setValues({ ...values, isImmersive: e.target.checked })}
             className="accent-[#9D508D]"
           />
-          Mostrar etiqueta «Realidad Inmersiva»
+          Curso con «Realidad Inmersiva» (VR con Meta Quest o modo escritorio en el navegador)
         </label>
+        {values.isImmersive && (
+          <Field label="Programa de la experiencia inmersiva que abre este curso">
+            <select value={values.immersiveModule} onChange={set('immersiveModule')} className={inputClass}>
+              {IMMERSIVE_MODULES.map((m) => (
+                <option key={m.id} value={m.id}>{m.label}</option>
+              ))}
+            </select>
+          </Field>
+        )}
         <FormActions onCancel={onClose} saving={saving} error={error} />
       </form>
     </Modal>

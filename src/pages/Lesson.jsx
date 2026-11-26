@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, BookOpen, ClipboardCheck, FileQuestion, Pencil } from 'lucide-react';
+import { Play, BookOpen, ClipboardCheck, FileQuestion, Pencil, Glasses, Monitor, ArrowRight } from 'lucide-react';
 import { useParams, Link } from 'react-router-dom';
 import { useCourse } from '../hooks/useFirestore';
 import { useAuth } from '../context/AuthContext';
@@ -111,6 +111,26 @@ const Lesson = () => {
                 </Link>
               ))}
             </div>
+
+            {/* REALIDAD INMERSIVA: solo en cursos marcados como inmersivos */}
+            {course.isImmersive && (
+              <Link
+                to={`/curso/${id}/inmersivo`}
+                className="group mt-6 flex flex-col sm:flex-row items-center gap-4 bg-gradient-to-r from-[#7A3F6C] to-[#a236df] text-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all"
+              >
+                <div className="flex gap-2 shrink-0">
+                  <Glasses size={30} />
+                  <Monitor size={30} />
+                </div>
+                <div className="flex-grow text-center sm:text-left">
+                  <span className="block text-lg font-semibold">Realidad inmersiva</span>
+                  <span className="block text-sm text-pink-100">
+                    Vívelo con el visor Meta Quest o desde el navegador, sin visor.
+                  </span>
+                </div>
+                <ArrowRight size={24} className="shrink-0 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            )}
           </div>
         </div>
       </div>
