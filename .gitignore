@@ -1,0 +1,6 @@
+# Cada parte tiene su propio .gitignore (web/.gitignore y unity/.gitignore)
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.claude/
