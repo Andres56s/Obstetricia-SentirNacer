@@ -130,10 +130,15 @@ La página (React + Vite + Firebase) muestra la versión web dentro de cada curs
 **Curso > Realidad inmersiva > «Sin visor (modo escritorio)»**. Unity le avisa a la página cuando está lista y
 le envía los resultados de las evaluaciones, que se guardan en Firestore (colección `immersiveResults`).
 
-> **Pendiente:** la versión de la página que trae la sección «Realidad inmersiva» todavía no está subida a
-> GitHub. Cuando Andrés la suba, los pasos son:
+La página está en <https://github.com/Andres56s/Proyecto_obste>, rama **`realidad-inmersiva`**.
 
-1. Clona el repositorio de la página en la carpeta **`web`**, al lado de `Obstetricia-VR` (ver el esquema del paso 5).
+1. Clona la página en una carpeta llamada **`web`**, al lado de `Obstetricia-VR` (ver el esquema del paso 5).
+   Desde la carpeta que contiene `Obstetricia-VR`:
+
+   ```powershell
+   git clone -b realidad-inmersiva https://github.com/Andres56s/Proyecto_obste.git web
+   ```
+
 2. Copia `web/.env.example` como `web/.env.local` y completa los datos de Firebase (pídeselos a Andrés; no se
    suben a GitHub).
 3. Genera la versión web de Unity (paso 5): queda sola en `web/public/unity`.
@@ -146,6 +151,10 @@ le envía los resultados de las evaluaciones, que se guardan en Firestore (colec
    ```
 
 5. Abre `http://localhost:5173`, inicia sesión y entra a un curso con realidad inmersiva.
+
+> Para guardar los resultados de las evaluaciones hechas dentro de Unity, las reglas nuevas de
+> `web/firestore.rules` (colección `immersiveResults`) tienen que estar publicadas en Firebase. Coordínalo con
+> Andrés antes de publicarlas, porque cambian la base de datos real.
 
 ## 7. Problemas comunes
 
