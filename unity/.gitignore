@@ -1,0 +1,47 @@
+# Carpetas generadas por Unity (se recrean al abrir el proyecto)
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+/.utmp/
+
+# Builds y depuración
+/[Bb]uild/
+/[Bb]uilds/
+*.apk
+*.aab
+*_BurstDebugInformation_DoNotShip/
+*_BackUpThisFolder_ButDontShipItWithYourGame/
+/Assets/Temp/
+/Assets/Temp.meta
+
+# Archivos del IDE (se regeneran)
+.vs/
+.vscode/
+.idea/
+*.csproj
+*.sln
+*.suo
+*.user
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Sistema y herramientas locales
+.DS_Store
+Thumbs.db
+.claude/
+/Herramientas/*.onnx
+/Herramientas/*.pt
+/Assets/_Recovery/
+/Assets/_Recovery.meta
+
+# Solución generada por el IDE (formato nuevo)
+*.slnx

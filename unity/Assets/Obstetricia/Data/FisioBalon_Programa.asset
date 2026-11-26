@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7d348282806a73468e4f5df15813da4, type: 3}
+  m_Name: FisioBalon_Programa
+  m_EditorClassIdentifier: Assembly-CSharp::Obstetricia.Data.FisioModuleData
+  programTitle: "PROGRAMA FISIO-BAL\xD3N Y M\xC9TODOS NO FARMACOL\xD3GICOS DEL DOLOR"
+  studentName: Estudiante
+  sections:
+  - menuLabel: "Anatom\xEDa"
+    iconId: cube
+    kind: 1
+    activity: "Anatom\xEDa p\xE9lvica"
+    video:
+      clip: {fileID: 0}
+      fileOrUrl: 
+      yawOffset: 0
+  - menuLabel: "Fisiolog\xEDa"
+    iconId: pulse
+    kind: 0
+    activity: 
+    video:
+      clip: {fileID: 0}
+      fileOrUrl: Videos360/fisiologia.mp4
+      yawOffset: 0
+  - menuLabel: Trabajo de parto
+    iconId: ball
+    kind: 0
+    activity: 
+    video:
+      clip: {fileID: 0}
+      fileOrUrl: Videos360/trabajo_de_parto.mp4
+      yawOffset: 0
+  - menuLabel: Mecanismos del parto
+    iconId: target
+    kind: 3
+    activity: Mecanismos del parto
+    video:
+      clip: {fileID: 0}
+      fileOrUrl: Videos360/mecanismos_del_parto.mp4
+      yawOffset: 0
+  - menuLabel: "Evaluaci\xF3n"
+    iconId: clipboard
+    kind: 2
+    activity: 
+    video:
+      clip: {fileID: 0}
+      fileOrUrl: 
+      yawOffset: 0
+  evaluation: {fileID: 11400000, guid: 554607d81d4078341b7e271f534992b7, type: 2}

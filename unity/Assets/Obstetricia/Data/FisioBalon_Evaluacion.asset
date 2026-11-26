@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cee6349df9d1c344bbb5c2eacdf80f9, type: 3}
+  m_Name: FisioBalon_Evaluacion
+  m_EditorClassIdentifier: Assembly-CSharp::Obstetricia.Data.QuizData
+  moduleLabel: "EVALUACI\xD3N"
+  title: "FISIO-BAL\xD3N"
+  subtitle: Comprueba lo aprendido en el programa.
+  iconId: clipboard
+  pointsPerCorrect: 100
+  motto: Responde y suma puntos.
+  mottoDetail: Elige la alternativa correcta
+  environment:
+    clip: {fileID: 0}
+    fileOrUrl: 
+    yawOffset: 0
+  questions:
+  - situation: "\xC1ngulo subp\xFAbico"
+    question: "\xBFQu\xE9 \xE1ngulo subp\xFAbico es caracter\xEDstico de la pelvis
+      femenina?"
+    options:
+    - title: "Mayor a 90\xB0"
+      description: Arco amplio que facilita el paso fetal.
+      image: {fileID: 0}
+    - title: "Menor a 70\xB0"
+      description: "Arco estrecho, t\xEDpico de la pelvis masculina."
+      image: {fileID: 0}
+    correctIndex: 0
+    environment:
+      clip: {fileID: 0}
+      fileOrUrl: 
+      yawOffset: 0
+  - situation: "Anatom\xEDa p\xE9lvica"
+    question: "\xBFQu\xE9 hueso forma la pared posterior de la pelvis?"
+    options:
+    - title: Pubis
+      description: Se ubica en la parte anterior.
+      image: {fileID: 0}
+    - title: Sacro
+      description: "Se articula con ambos iliacos en las articulaciones sacroil\xEDacas."
+      image: {fileID: 0}
+    correctIndex: 1
+    environment:
+      clip: {fileID: 0}
+      fileOrUrl: 
+      yawOffset: 0
+  - situation: "Fisio-bal\xF3n"
+    question: "\xBFCu\xE1l es un beneficio del uso del bal\xF3n durante el trabajo
+      de parto?"
+    options:
+    - title: "Favorece la movilidad p\xE9lvica"
+      description: Permite posiciones verticales, balanceos y ayuda al alivio del
+        dolor.
+      image: {fileID: 0}
+    - title: "Reemplaza la monitorizaci\xF3n"
+      description: Hace innecesario el control de la madre y el feto.
+      image: {fileID: 0}
+    correctIndex: 0
+    environment:
+      clip: {fileID: 0}
+      fileOrUrl: 
+      yawOffset: 0
+  - situation: "M\xE9todos no farmacol\xF3gicos"
+    question: "\xBFCu\xE1l es un m\xE9todo NO farmacol\xF3gico de alivio del dolor?"
+    options:
+    - title: Anestesia epidural
+      description: "Analgesia farmacol\xF3gica neuroaxial."
+      image: {fileID: 0}
+    - title: Masaje y calor local
+      description: "Junto con respiraci\xF3n, deambulaci\xF3n y bal\xF3n."
+      image: {fileID: 0}
+    correctIndex: 1
+    environment:
+      clip: {fileID: 0}
+      fileOrUrl: 
+      yawOffset: 0
+  - situation: Mecanismos del parto
+    question: "\xBFCu\xE1l es el primer movimiento cardinal del mecanismo del parto
+      (presentaci\xF3n cef\xE1lica)?"
+    options:
+    - title: Encajamiento
+      description: La cabeza fetal atraviesa el estrecho superior.
+      image: {fileID: 0}
+    - title: "Rotaci\xF3n externa"
+      description: Ocurre tras la salida de la cabeza.
+      image: {fileID: 0}
+    correctIndex: 0
+    environment:
+      clip: {fileID: 0}
+      fileOrUrl: 
+      yawOffset: 0
