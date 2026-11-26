@@ -85,7 +85,7 @@ function AppShell() {
             <CourseBlocksPage section="teoria" title="Teórico" emptyText="Aún no hay contenido teórico en este curso." />
           } />
           <Route path="/curso/:id/practico" element={
-            <CourseBlocksPage section="practica" title="Práctico" emptyText="Aún no hay actividades prácticas en este curso." />
+            <CourseBlocksPage section="practica" title="Práctico" emptyText="Aún no hay videos 360° de práctica en este curso." />
           } />
           <Route path="/curso/:id/prueba" element={<CoursePrueba />} />
           {/* Realidad inmersiva: con visor VR (Meta Quest) o en el navegador (modo escritorio) */}

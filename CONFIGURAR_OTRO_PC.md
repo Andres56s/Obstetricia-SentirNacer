@@ -136,25 +136,45 @@ Para quien retome el trabajo (persona o Claude):
 - **Narración por voz**: apagada por defecto (Ajustes > Narración por voz).
 - **Página**: `/curso/:id/inmersivo` (`web/src/pages/ImmersivePage.jsx`, `web/src/components/ImmersivePlayer.jsx`);
   cada curso elige qué programa abre (`immersiveModule`: mesa, `fisio`, `legal` o `sala`).
+- **Práctico = simulación con videos 360°** (solo en la página, **no** va en la experiencia Unity): el apartado
+  Práctico de cada curso es una galería de videos 360° (`web/src/components/Practica360.jsx`). Al elegir un video:
+  - **Ver video** lo abre en YouTube (el reproductor incrustado no dejaba mirar alrededor).
+  - **Ver en VR** usa el visor propio `web/src/components/Video360Viewer.jsx` (three.js + WebXR): con las Quest
+    conectadas al PC por **Quest Link** y la página abierta en **Chrome o Edge** (o desde el navegador de las
+    Quest), «Entrar al visor VR» pone al usuario dentro del video y se mueve con la cabeza; el gatillo pausa.
+    Admite guía por tiempos (`minuto:segundo | texto | pausa`). Necesita el video como `.mp4` (YouTube no sirve).
+  - Videos incluidos en código: `web/src/data/videos360.js`. El de Fisio-balón (curso `1`) usa YouTube
+    `BPlModwMZG4` para «Ver video» y el archivo `web/public/videos360/practica-fisiobalon.mp4` (30 MB) para «Ver en VR».
+  - Los profesores pueden agregar más con «Agregar video 360°» (se guardan en `courses/{id}.practica`).
+  - Ya no se muestra el «Test práctico» (las preguntas siguen en `practicaTest`, solo ocultas).
+- **Preferencias del usuario (Andrés)**: habla español; prefiere que se trabaje desde la carpeta
+  `Obstetricia-SentirNacer`; hay que preguntarle antes de subir a GitHub, de tocar la base de datos real o de
+  cambiar algo fuera de lo que pidió; los cambios grandes se prueban en el navegador antes de entregarlos.
 - **Pendiente**:
+  - Probar «Ver en VR» del Práctico con las Quest conectadas por Quest Link (no se ha probado con visor real).
   - Publicar las reglas de `web/firestore.rules` (colección `immersiveResults`) en Firebase: cambian la base de
     datos real, hacerlo solo cuando el equipo lo decida.
-  - Que el compañero pruebe la rama `modo-escritorio-web` en las Quest y la junte con su `main`.
-  - Los videos 360° (`unity/Assets/StreamingAssets/Videos360/*.mp4`) no están en el repo: los tiene el compañero.
-  - Juntar `realidad-inmersiva` con `main` en el repo de la página cuando todo esté probado.
+  - Que el compañero pruebe la rama `modo-escritorio-web` en las Quest (maletín, modo escritorio) y la junte con su `main`.
+  - Videos 360° del programa Fisio en Unity (`unity/Assets/StreamingAssets/Videos360/*.mp4`): no están en el repo,
+    los tiene el compañero.
+  - Juntar `realidad-inmersiva` con `main` en el repo de la página cuando todo esté probado, y publicar la página
+    (WebXR necesita https para usar el visor desde una página publicada).
 
 ## Texto para Claude Code
 
 Si usas Claude Code en el otro computador, abre una sesión en la carpeta donde quieras el proyecto y pégale esto:
 
 ```text
-Quiero dejar funcionando en este computador el proyecto Sentir Nacer (página web + experiencia Unity VR).
+Quiero dejar funcionando en este computador el proyecto Sentir Nacer (página web + experiencia Unity VR)
+y seguir trabajando en él desde aquí.
 Lee primero la guía completa:
 https://github.com/Andres56s/Proyecto_obste/blob/realidad-inmersiva/CONFIGURAR_OTRO_PC.md
 y síguela paso a paso: revisa qué programas ya están instalados e instala los que falten (pídeme permiso
 antes de instalar y avísame cuando tenga que aceptar algo yo, como la licencia de Android en Unity Hub),
 crea la carpeta Obstetricia-SentirNacer con los dos repos clonados en sus ramas (web y unity), y dime
 cuándo copiar mi archivo .env.local. Después levanta la página, genera la versión web de Unity y
-pruébala en el navegador. No subas nada a GitHub ni hagas cambios en main sin preguntarme.
-Lee también la sección "Estado del proyecto" de la guía: es el contexto de lo que ya está hecho.
+pruébala en el navegador (la mesa UCEN con el maletín, y el Práctico de Fisio-balón con sus videos 360°).
+Lee también la sección "Estado del proyecto" de la guía: es el contexto de todo lo que ya está hecho,
+lo que falta y cómo prefiero trabajar. Guárdalo en tu memoria para las próximas sesiones.
+No subas nada a GitHub, no toques la base de datos real de Firebase ni hagas cambios en main sin preguntarme.
 ```

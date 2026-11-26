@@ -72,6 +72,24 @@ Ambas usan `components/QuizSection.jsx`; la diferencia es la prop `isFinal`.
 **Permiso del profesor:** Panel > **Resultados** > columna **«Permitir repetir»** (interruptor por alumno y curso). Activado, el alumno puede rendir **una vez más**; al enviar, el permiso se consume y la prueba se bloquea de nuevo. Esto lo hacen cumplir también las reglas de Firestore, no solo la pantalla.
 Profesores y administradores pueden abrir la Prueba para revisarla sin que se guarde nada.
 
+### Práctico = simulación con videos 360° (con opción de visor VR)
+El apartado **Práctico** es una galería de videos 360°: el estudiante elige uno y decide **«Ver video»** (en la
+pantalla, arrastrando para mirar alrededor) o **«Ver en VR»** (con el visor, para hacer en la vida real lo que
+muestra el video). Es aparte de la experiencia Unity. Ya no muestra el test práctico (las preguntas siguen
+guardadas en `practicaTest`, solo no se muestran).
+- **Videos incluidos en la página:** `data/videos360.js` (por id de curso). Ahí está el video de Fisio-balón.
+- **Videos que agrega el profesor:** botón **«Agregar video 360°»** (se guardan en `courses/{id}.practica`).
+  Solo se muestran los bloques que tienen video.
+- **Solo YouTube:** «Ver video» lo reproduce en la página; «Ver en VR» lo abre en YouTube (en las Meta Quest se
+  ve en YouTube VR, en 360°).
+- **Con .mp4 propio** (campo «enlace directo al .mp4»): se usa el visor de `components/Video360Viewer.jsx`
+  (three.js) con guía y, abierto desde el navegador de las Quest, **«Entrar al visor VR»** (WebXR). El enlace debe
+  ser directo y permitir CORS (p. ej. Firebase Storage con CORS); **Google Drive y YouTube no sirven** para esto.
+  WebXR exige que la página esté publicada con **https** (o en `localhost`).
+- **Guía** (solo con .mp4), una línea por punto: `1:25 | ¿Qué movimiento hace la pelvis? | pausa`. El texto
+  aparece sobre el video (también dentro del visor) y con `| pausa` el video se detiene hasta reanudarlo.
+- Galería y ventana del video: `components/Practica360.jsx`.
+
 ### Realidad inmersiva (VR y modo escritorio)
 - Un curso con la casilla **«Realidad Inmersiva»** muestra el botón **Realidad inmersiva** → `/curso/:id/inmersivo` (`pages/ImmersivePage.jsx`).
 - Ahí el alumno elige **Con visor VR** (app de Meta Quest) o **Sin visor**: la experiencia Unity corre dentro de la página (`components/ImmersivePlayer.jsx`, iframe a `/unity/index.html`).

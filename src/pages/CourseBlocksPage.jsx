@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Plus } from 'lucide-react';
+import { ArrowLeft, Plus, Glasses } from 'lucide-react';
 import { useCourse } from '../hooks/useFirestore';
 import { useAuth } from '../context/AuthContext';
 import { updateCourse } from '../services/db';
 import ContentBlock from '../components/ContentBlock';
 import BlockFormModal from '../components/BlockFormModal';
-import QuizSection from '../components/QuizSection';
+import Practica360 from '../components/Practica360';
+import { videosIncluidos } from '../data/videos360';
 
 // =====================================================================
 // APARTADOS "TEÓRICO" y "PRÁCTICO"
 // =====================================================================
 // Una sola página sirve para los dos (App.jsx le pasa `section`):
 //   section="teoria"   -> guarda en  courses/{id}.teoria
-//   section="practica" -> guarda en  courses/{id}.practica
+//   section="practica" -> guarda en  courses/{id}.practica  (se muestra como galería de videos 360°)
 // Todos pueden LEER. Solo profesor/admin ven los botones de agregar, editar y borrar.
 // =====================================================================
 
@@ -25,13 +26,25 @@ const FIELDS = {
     { name: 'imageUrl', label: 'Imagen (enlace URL, opcional)', type: 'url' },
     { name: 'videoUrl', label: 'Video de YouTube (opcional)', type: 'url' },
   ],
+  // Práctico = videos 360° para practicar con el visor puesto (ver components/Practica360.jsx).
   practica: [
-    { name: 'title', label: 'Título de la actividad', type: 'text', required: true },
-    { name: 'text', label: 'Instrucciones / descripción de la dinámica', type: 'textarea' },
-    { name: 'imageUrl', label: 'Imagen (enlace URL, opcional)', type: 'url' },
-    { name: 'link', label: 'Enlace a un recurso o examen externo (opcional)', type: 'url' },
+    { name: 'title', label: 'Título del video', type: 'text', required: true },
+    { name: 'text', label: 'Qué se practica (descripción corta)', type: 'textarea' },
+    { name: 'videoUrl', label: 'Video 360° de YouTube', type: 'url' },
+    {
+      name: 'video360Url',
+      label: 'O enlace directo al .mp4 360° (opcional): permite verlo en VR dentro de la página, con guía',
+      type: 'url',
+    },
+    {
+      name: 'guia360',
+      label: 'Guía del video (opcional, solo con .mp4). Una línea por punto: minuto:segundo | texto | pausa',
+      type: 'textarea',
+    },
   ],
 };
+
+const tieneVideo = (b) => Boolean(b.videoUrl || b.video360Url);
 
 const CourseBlocksPage = ({ section, title, emptyText }) => {
   const { id } = useParams();
@@ -44,6 +57,9 @@ const CourseBlocksPage = ({ section, title, emptyText }) => {
   if (!course) return <div className="text-center p-10">Curso no encontrado.</div>;
 
   const blocks = course[section] || [];
+  // Práctico: los videos incluidos en la página (data/videos360.js) + los que agregan los profesores.
+  const videosPractica =
+    section === 'practica' ? [...videosIncluidos(id).map((v) => ({ ...v, incluido: true })), ...blocks.filter(tieneVideo)] : [];
 
   // Guarda la lista COMPLETA de bloques del apartado en el curso.
   const saveBlocks = (next) => updateCourse(id, { [section]: next });
@@ -72,13 +88,34 @@ const CourseBlocksPage = ({ section, title, emptyText }) => {
               onClick={() => setModal({})}
               className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors"
             >
-              <Plus size={18} /> Agregar bloque
+              <Plus size={18} /> {section === 'practica' ? 'Agregar video 360°' : 'Agregar bloque'}
             </button>
           )}
         </div>
         <div className="w-20 h-1 bg-primary mb-8 rounded-full"></div>
 
-        {blocks.length === 0 ? (
+        {section === 'practica' ? (
+          <>
+            {/* PRÁCTICO: simulación con videos 360°. Se mira el video con el visor y se hace lo mismo en la vida real. */}
+            <div className="flex items-start gap-3 bg-white border border-primary/20 rounded-xl p-4 mb-6 text-sm text-gray-600">
+              <Glasses size={22} className="text-primary shrink-0 mt-0.5" />
+              <p>
+                <b className="text-primary-dark">Práctica con simulación en video 360°.</b> Elige un video y ponte el visor
+                VR: quedarás dentro de la escena para hacer en la vida real lo que muestra el video. También puedes verlo en
+                la pantalla, arrastrando para mirar alrededor.
+              </p>
+            </div>
+            {videosPractica.length === 0 ? (
+              <p className="text-gray-500 bg-white rounded-xl border border-gray-100 p-8 text-center">{emptyText}</p>
+            ) : (
+              <Practica360
+                videos={videosPractica}
+                onEdit={isStaff ? (block) => setModal({ block }) : undefined}
+                onDelete={isStaff ? handleDelete : undefined}
+              />
+            )}
+          </>
+        ) : blocks.length === 0 ? (
           <p className="text-gray-500 bg-white rounded-xl border border-gray-100 p-8 text-center">{emptyText}</p>
         ) : (
           <div className="space-y-6">
@@ -93,15 +130,6 @@ const CourseBlocksPage = ({ section, title, emptyText }) => {
           </div>
         )}
       </div>
-
-      {/* Solo en PRÁCTICO: test con intentos ILIMITADOS (no se guarda nota ni se bloquea) */}
-      {section === 'practica' && (isStaff || (course.practicaTest || []).length > 0) && (
-        <div className="max-w-3xl mx-auto px-4 pt-4">
-          <h2 className="text-2xl font-display font-bold text-primary-dark uppercase mb-1">Test práctico</h2>
-          <p className="text-sm text-gray-500 mb-6">Puedes realizarlo y repetirlo todas las veces que quieras.</p>
-          <QuizSection course={course} field="practicaTest" isFinal={false} />
-        </div>
-      )}
 
       {modal && (
         <BlockFormModal

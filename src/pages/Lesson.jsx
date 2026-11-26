@@ -10,7 +10,7 @@ import { toEmbedUrl } from '../utils/video';
 // Para cambiar el texto o el ícono de un botón, edita esta lista.
 const SECTIONS = [
   { to: 'teorico', label: 'Teórico', hint: 'Material de estudio', Icon: BookOpen },
-  { to: 'practico', label: 'Práctico', hint: 'Exámenes y dinámicas', Icon: ClipboardCheck },
+  { to: 'practico', label: 'Práctico', hint: 'Simulación en video 360° con VR', Icon: ClipboardCheck },
   { to: 'prueba', label: 'Prueba', hint: 'Evaluación final', Icon: FileQuestion },
 ];
 
